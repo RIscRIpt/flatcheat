@@ -1,0 +1,1 @@
+MAX_PREFIX_LENGTH = 31 ;+1 NULL byte
