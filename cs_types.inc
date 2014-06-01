@@ -543,6 +543,20 @@ struct ClientDLL_s
 	ClientFactory					dd ?
 ends
 
+struct NET_API_s
+	InitNetworking					dd ?
+	Status							dd ?
+	SendRequest						dd ?
+	CancelRequest					dd ?
+	CancelAllRequests				dd ?
+	AdrToString						dd ?
+	CompareAdr						dd ?
+	StringToAdr						dd ?
+	ValueForKey						dd ?
+	RemoveKey						dd ?
+	SetValueForKey					dd ?
+ends
+
 struct Engine_s
 	pfnSPR_Load						dd ?
 	pfnSPR_Frames					dd ?
@@ -675,4 +689,10 @@ struct Engine_s
 	pfnClearArray					dd ?
 	pfnPlaySound2					dd ?
 	pfnTintRGBA						dd ?
+ends
+
+struct command_s
+	next	dd ?
+	name	dd ?
+	func	dd ?
 ends

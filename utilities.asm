@@ -68,11 +68,36 @@ macro FindRefWithPrefix start, size, prefix, prefix_size, address {
 	add esp, 4 + prefix_size
 }
 
-ASM_INSTR_PUSH_DWORD = 0x68
-sizeof.ASM_INSTR_PUSH_DWORD = 1
+macro asm_instr name, value, size {
+	ASM_INSTR_#name = value
+	sizeof.ASM_INSTR_#name = size
+}
 
-ASM_INSTR_PUSH_BYTE = 0x6A
-sizeof.ASM_INSTR_PUSH_BYTE = 1
+asm_instr PUSH_DWORD,			0x68,	1
+asm_instr PUSH_BYTE,			0x6A,	1
+asm_instr CALL,					0xE8,	1
+asm_instr JMP,					0xE9,	1
+asm_instr MOV_ECX_DWORD_PTR,	0x0D8B, 2
+asm_instr CALL_DWORD_PTR,		0x15FF,	2
+asm_instr MOV_ESI_DWORD_PTR,	0x358B, 2
 
-ASM_INSTR_CALL_DWORD_PTR = 0x15FF
-sizeof.ASM_INSTR_CALL_DWORD_PTR = 2
+proc GetCmdByNameL szCmdName, cmdNameLen
+	mov edx, [cmdNameLen]
+	mov ebx, [szCmdName]
+	mov eax, [ppCmdList]
+	mov eax, [eax]
+	virtual at eax
+		.cmd command_s
+	end virtual
+	.next:
+	mov ecx, edx
+	mov edi, ebx
+	mov esi, [.cmd.name]
+	repe cmpsb
+	je .found
+	mov eax, [.cmd.next]
+	test eax, eax
+	jnz .next
+	.found:
+	ret
+endp
