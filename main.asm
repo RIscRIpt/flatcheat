@@ -5,7 +5,7 @@ proc flatcheat_inject
 	stdcall AO_GetAll
 	
 	cinvoke Engine.pfnConsolePrint, szWelcomeMessage
-	
+
 	stdcall Hook_List, hookList_ClientDLL
 	;stdcall Hook_List, hookList_Engine
 	;cinvoke ClientDLL.Initialize, [pEngine], [ClientDLL_Interface_Version]

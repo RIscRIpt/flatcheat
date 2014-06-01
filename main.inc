@@ -30,6 +30,7 @@ ClientDLL_Interface_Version dd 0
 
 pConsoleColor		dd ? ;ptr to Console text color
 pConsoleDevColor	dd ? ;ptr to Console text color, when developer = 1
+pushScreenFade		dd ? ;ptr to push OFFSET "ScreenFade"
 pClientDLL			dd ? ;ptr to ClientDLL_s
 pEngine				dd ? ;ptr to Engine_s
 
@@ -38,6 +39,7 @@ Engine		Engine_s
 
 hookList_ClientDLL:
 	VTHook_s pClientDLL, ClientDLL_s.CL_CreateMove, CL_CreateMove
+	;VTHook_s pClientDLL, ClientDLL_s.HUD_PlayerMove, HUD_PlayerMove
 	dd 0
 
 hookList_Engine:

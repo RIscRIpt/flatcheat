@@ -56,39 +56,63 @@ proc AO_GetAll uses ebp ;ebp is the only register that is saved between calls of
 	ret
 endp
 
-proc AO_GetEngine
+proc AO_GetConsoleColor
+	;DWORD dwConColor = (*(DWORD*)(((**(DWORD**)((((DWORD)FindCmd("clear") + 26) + (*(DWORD*)((DWORD)FindCmd("clear") + 26)) + 4) + 2)) + 8)) + 296 );  // This is my version of it with 2xFindCmd
+	;pConColor = (color24*)dwConColor;
+	;pConColorDev = (color24*)(dwConColor + 4);
+	ret
+endp
+
+proc AO_GetScreenFadePushReference
 	stdcall FindBytePattern, [hw.base], [hw.size], szScreenFade, sizeof.szScreenFade - 1
 	test eax, eax
 	jnz .found1
-	stdcall ShowFatalError, szErr_GetEngine_screenfade
+	stdcall ShowFatalError, szErr_GetScreenFadePushReference1
 	.found1:
 	FindRefWithPrefix [hw.base], [hw.size], ASM_INSTR_PUSH_DWORD, sizeof.ASM_INSTR_PUSH_DWORD, eax
 	test eax, eax
 	jnz .found2
-	stdcall ShowFatalError, szErr_GetEngine_ref
+	stdcall ShowFatalError, szErr_GetScreenFadePushReference2
 	.found2:
-	add eax, 0x0D
-	mov eax, [eax]
+	mov [pushScreenFade], eax
+	ret
+endp
+
+proc AO_GetEngine
+	mov eax, [pushScreenFade]
+	add eax, 0x0C
+	cmp byte[eax], ASM_INSTR_PUSH_DWORD
+	je .found
+	stdcall ShowFatalError, szErr_GetEngine_InvalidByte
+	.found:
+	mov eax, [eax + 1]
 	mov [pEngine], eax
 	memcpy Engine, eax, sizeof.Engine_s
 	ret
 endp
 
 proc AO_GetClientDLL
-	stdcall FindBytePattern, [hw.base], [hw.size], szScreenFade, sizeof.szScreenFade - 1
-	test eax, eax
-	jnz .found1
-	stdcall ShowFatalError, szErr_GetClientDLL_screenfade
-	.found1:
-	FindRefWithPrefix [hw.base], [hw.size], ASM_INSTR_PUSH_DWORD, sizeof.ASM_INSTR_PUSH_DWORD, eax
-	test eax, eax
-	jnz .found2
-	stdcall ShowFatalError, szErr_GetClientDLL_ref
-	.found2:
-	add eax, 0x13
-	mov eax, [eax]
+	mov eax, [pushScreenFade]
+	add eax, 0x11
+	cmp word[eax], ASM_INSTR_CALL_DWORD_PTR
+	je .found
+	stdcall ShowFatalError, szErr_GetClientDLL_InvalidWord
+	.found:
+	mov eax, [eax + 2]
 	mov [pClientDLL], eax
 	memcpy ClientDLL, eax, sizeof.ClientDLL_s
+	ret
+endp
+
+proc AO_GetPlayerMove_Ptr
+	mov eax, [pushScreenFade]
+	add eax, 0x17
+	cmp byte[eax], ASM_INSTR_PUSH_DWORD
+	je .found
+	stdcall ShowFatalError, szErr_GetPlayerMove_Ptr_IB
+	.found:
+	mov eax, [eax + 1]
+	mov [me.ppmove], eax
 	ret
 endp
 
@@ -109,12 +133,5 @@ proc AO_GetClientDLL_Interface_Version
 	.ver_is_byte:
 	mov al, [eax + 1]
 	mov byte[ClientDLL_Interface_Version], al
-	ret
-endp
-
-proc AO_GetConsoleColor
-	;DWORD dwConColor = (*(DWORD*)(((**(DWORD**)((((DWORD)FindCmd("clear") + 26) + (*(DWORD*)((DWORD)FindCmd("clear") + 26)) + 4) + 2)) + 8)) + 296 );  // This is my version of it with 2xFindCmd
-	;pConColor = (color24*)dwConColor;
-	;pConColorDev = (color24*)(dwConColor + 4);
 	ret
 endp

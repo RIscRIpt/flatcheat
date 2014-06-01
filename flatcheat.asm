@@ -15,6 +15,7 @@ section '.data' data readable writeable
 	include 'main.inc'
 	include 'auto_offsets.inc'
 	
+	include 'local_player_data.inc'
 	include 'clientdll.inc'
 	include 'engine.inc'
 
@@ -85,6 +86,7 @@ section '.code' code readable executable
 	include 'main.asm'
 	include 'auto_offsets.asm'
 	
+	include 'local_player_data.asm'
 	include 'clientdll.asm'
 	include 'engine.asm'
 
