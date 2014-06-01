@@ -82,13 +82,13 @@ asm_instr CALL_DWORD_PTR,		0x15FF,	2
 asm_instr MOV_ESI_DWORD_PTR,	0x358B, 2
 
 proc GetCmdByNameL szCmdName, cmdNameLen
-	mov edx, [cmdNameLen]
-	mov ebx, [szCmdName]
-	mov eax, [ppCmdList]
+	cinvoke Engine.pfnGetCmdList
 	mov eax, [eax]
 	virtual at eax
 		.cmd command_s
 	end virtual
+	mov edx, [cmdNameLen]
+	mov ebx, [szCmdName]
 	.next:
 	mov ecx, edx
 	mov edi, ebx

@@ -56,59 +56,6 @@ proc AO_GetAll uses ebp ;ebp is the only register that is saved between calls of
 	ret
 endp
 
-proc AO_GetCommandListBase
-	mov eax, [Engine.pfnAddCommand]
-	add eax, 0x19
-	cmp byte[eax], ASM_INSTR_CALL
-	je .found1
-	stdcall ShowFatalError, szErr_GetCmdListBase_IB1
-	.found1:
-	add eax, [eax + 1]
-	add eax, 0x05 + 0x0D
-	cmp byte[eax], ASM_INSTR_CALL
-	je .found2
-	stdcall ShowFatalError, szErr_GetCmdListBase_IB2
-	.found2:
-	add eax, [eax + 1]
-	add eax, 0x05 + 0x29
-	cmp word[eax], ASM_INSTR_MOV_ESI_DWORD_PTR
-	je .found3
-	stdcall ShowFatalError, szErr_GetCmdListBase_IW
-	.found3:
-	mov eax, [eax + 2]
-	mov [ppCmdList], eax
-	ret
-endp
-
-proc AO_GetConsoleColor
-	stdcall GetCmdByNameL, szClear, sizeof.szClear
-	test eax, eax
-	jnz .found1
-	stdcall ShowFatalError, szErr_GetConsoleColor_CmdClear
-	.found1:
-	mov eax, [eax + command_s.func]
-	add eax, 0x19
-	cmp byte[eax], ASM_INSTR_JMP
-	je .found2
-	stdcall ShowFatalError, szErr_GetConsoleColor_IB
-	.found2:
-	lea edx, [eax + 1 + 4]
-	mov eax, [eax + 1]
-	add eax, edx
-	cmp word[eax], ASM_INSTR_MOV_ECX_DWORD_PTR
-	je .found3
-	stdcall ShowFatalError, szErr_GetConsoleColor_IW
-	.found3:
-	mov eax, [eax + 2]
-	mov eax, [eax]
-	mov eax, [eax + 8]
-	add eax, 0x128
-	mov [pConsoleColor], eax
-	add eax, 4
-	mov [pConsoleDevColor], eax
-	ret
-endp
-
 proc AO_GetScreenFadePushReference
 	stdcall FindBytePattern, [hw.base], [hw.size], szScreenFade, sizeof.szScreenFade - 1
 	test eax, eax
@@ -179,5 +126,34 @@ proc AO_GetClientDLL_Interface_Version
 	.ver_is_byte:
 	mov al, [eax + 1]
 	mov byte[ClientDLL_Interface_Version], al
+	ret
+endp
+
+proc AO_GetConsoleColor
+	stdcall GetCmdByNameL, szClear, sizeof.szClear
+	test eax, eax
+	jnz .found1
+	stdcall ShowFatalError, szErr_GetConsoleColor_CmdClear
+	.found1:
+	mov eax, [eax + command_s.func]
+	add eax, 0x19
+	cmp byte[eax], ASM_INSTR_JMP
+	je .found2
+	stdcall ShowFatalError, szErr_GetConsoleColor_IB
+	.found2:
+	lea edx, [eax + 1 + 4]
+	mov eax, [eax + 1]
+	add eax, edx
+	cmp word[eax], ASM_INSTR_MOV_ECX_DWORD_PTR
+	je .found3
+	stdcall ShowFatalError, szErr_GetConsoleColor_IW
+	.found3:
+	mov eax, [eax + 2]
+	mov eax, [eax]
+	mov eax, [eax + 8]
+	add eax, 0x128
+	mov [pConsoleColor], eax
+	add eax, 4
+	mov [pConsoleDevColor], eax
 	ret
 endp

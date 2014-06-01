@@ -28,7 +28,6 @@ string szPrefixFilename, 'prefix.ini'
 align 4
 ClientDLL_Interface_Version dd 0
 
-ppCmdList			dd ? ;ptr to ptr to command_s
 pConsoleColor		dd ? ;ptr to Console text color
 pConsoleDevColor	dd ? ;ptr to Console text color, when developer = 1
 pushScreenFade		dd ? ;ptr to push OFFSET "ScreenFade"

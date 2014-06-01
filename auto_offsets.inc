@@ -4,14 +4,20 @@ struct hl_module
 	size dd ?
 ends
 
-string szhwdll,		'hw.dll'
-string szclientdll,	'client.dll'
-string szvgui2dll,	'vgui2.dll'
+string szhwdll,			'hw.dll'
+string szclientdll,		'client.dll'
+string szvgui2dll,		'vgui2.dll'
+string szgameuidll,		'GameUI.dll'
+string szopengl32dll,	'OPENGL32.dll'
+string sztier0dll,		'tier0.dll'
 
 moduleList:
 hw		hl_module szhwdll
 client	hl_module szclientdll
 vgui2	hl_module szvgui2dll
+gameui	hl_module szgameuidll
+opengl	hl_module szopengl32dll
+tier0	hl_module sztier0dll
 moduleListEnd:
 
 ao_getList:
@@ -19,12 +25,11 @@ dd AO_GetScreenFadePushReference	;for Engine, ClientDLL, pPmove
 
 dd AO_GetEngine
 
-dd AO_GetCommandListBase
-dd AO_GetConsoleColor				;must be after AO_GetCommandListBase
-
 dd AO_GetClientDLL
 dd AO_GetPlayerMove_Ptr
 dd AO_GetClientDLL_Interface_Version
+
+dd AO_GetConsoleColor
 ao_getListEnd:
 
 ;Patterns:
@@ -41,10 +46,6 @@ string szErr_GetPlayerMove_Ptr_IB,			'AO_GetPlayerMove_Ptr failed, invalid byte 
 
 string szErr_GetClientDLL_IV_ref,			'AO_GetClientDLL_Interface_Version failed to find reference of call dword ptr ClientDLL.Initialize'
 string szErr_GetClientDLL_IV_notbyte,		'AO_GetClientDLL_Interface_Version found version is not byte (?)'
-
-string szErr_GetCmdListBase_IB1,			'AO_GetCommandListBase failed, invalid byte found at 0x19 + [Engine.pfnAddCommand]'
-string szErr_GetCmdListBase_IB2,			'AO_GetCommandListBase failed, invalid byte found at 0x12 + [0x1A + [Engine.pfnAddCommand]]'
-string szErr_GetCmdListBase_IW,				'AO_GetCommandListBase failed, invalid word found at 0x2E + [0x13 + [0x1A + [Engine.pfnAddCommand]]]'
 
 string szErr_GetConsoleColor_CmdClear,		<'AO_GetConsoleColor couldn', "'", 't find address of command "clear"'>
 string szErr_GetConsoleColor_IB,			'AO_GetConsoleColor failed, invalid byte found at 0x19 + "clear" function'
