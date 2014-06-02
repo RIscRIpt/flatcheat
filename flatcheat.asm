@@ -3,7 +3,7 @@ format PE GUI 5.0 DLL
 include 'win32a.inc'
 include 'windef.inc'
 include 'exmacro.inc'
-
+include 'print.inc'
 include 'cs_types.inc'
 include 'features.inc'
 
@@ -15,6 +15,7 @@ section '.data' data readable writeable
 	include 'main.inc'
 	include 'auto_offsets.inc'
 	
+	include 'cvars.inc'
 	include 'local_player_data.inc'
 	include 'clientdll.inc'
 	include 'engine.inc'
@@ -86,6 +87,7 @@ section '.code' code readable executable
 	include 'main.asm'
 	include 'auto_offsets.asm'
 	
+	include 'cvars.asm'
 	include 'local_player_data.asm'
 	include 'clientdll.asm'
 	include 'engine.asm'
