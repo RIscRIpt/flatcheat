@@ -19,13 +19,15 @@ section '.data' data readable writeable
 	include 'local_player_data.inc'
 	include 'clientdll.inc'
 	include 'engine.inc'
+	
+	include 'utilities.inc'
 
 	szError db 'Error', 0
 	szFatalError db	'flatcheat has stopped working', 13, 10,\
 					'Error #'
 	FatalErrorNo db	'00000000', 0
 
-section '.code' code readable executable
+section '.code' code readable writeable executable
 
 	FatalError:
 		invoke GetLastError

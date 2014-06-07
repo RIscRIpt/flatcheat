@@ -10,20 +10,7 @@ struct VTRestore_s
 	table_offset dd ?
 ends
 
-szWelcomeMessage db	'flatcheat has been successfully loaded.', 0
-
-if MAX_PREFIX_LENGTH > 0
-	if MAX_PREFIX_LENGTH <= 127
-		prefix db MAX_PREFIX_LENGTH + 1 dup 0
-		sizeof.prefix = $ - prefix
-	else
-		display 'Are you crazy, or what? Why do you need so long prefix?', 13, 10
-		err
-	end if
-end if
-
-string szPrefixFilename, 'prefix.ini'
-
+szWelcomeMessage db	'flatcheat has been successfully loaded.', 10, 0
 
 align 4
 ClientDLL_Interface_Version dd 0
@@ -33,6 +20,9 @@ pConsoleDevColor	dd ? ;ptr to Console text color, when developer = 1
 pushScreenFade		dd ? ;ptr to push OFFSET "ScreenFade"
 pClientDLL			dd ? ;ptr to ClientDLL_s
 pEngine				dd ? ;ptr to Engine_s
+
+pRegVarMallocCall	dd ? ;ptr to pfnRegisterVariable malloc call address
+
 
 ClientDLL	ClientDLL_s
 Engine		Engine_s

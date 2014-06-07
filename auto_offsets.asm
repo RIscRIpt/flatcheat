@@ -157,3 +157,15 @@ proc AO_GetConsoleColor
 	mov [pConsoleDevColor], eax
 	ret
 endp
+
+proc AO_GetRegisterVariableMallocCall
+	mov eax, [Engine.pfnRegisterVariable]
+	add eax, 0x18
+	cmp byte[eax], ASM_INSTR_CALL
+	je .found1
+	stdcall ShowFatalError, szErr_GetRegVarMallocCall_IB
+	.found1:
+	inc eax
+	mov [pRegVarMallocCall], eax
+	ret
+endp

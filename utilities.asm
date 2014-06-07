@@ -101,3 +101,20 @@ proc GetCmdByNameL szCmdName, cmdNameLen
 	.found:
 	ret
 endp
+
+proc VirtualProtect_s ;lpAddress, dwSize, flNewProtect, lpflOldProtect
+	;Jumping into VirtualProtect without re-pushing parameters
+	;Save original return address
+	mov eax, [esp]
+	mov [.orig_ret + 1], eax
+	sub dword[.orig_ret + 1], .orig_ret + 5
+	;Set new return address
+	mov dword[esp], .return
+	jmp [VirtualProtect]
+	.return:
+	test eax, eax
+	jnz .orig_ret
+	stdcall ShowFatalError, szErr_VirtualProtect_s
+	.orig_ret:
+	jmp near .orig_ret ;force 4byte jmp, will be modified above
+endp

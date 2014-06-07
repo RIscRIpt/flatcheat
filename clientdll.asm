@@ -26,17 +26,21 @@ proc CL_CreateMove c frametime, _cmd, active
 		cmd usercmd_s
 	end virtual
 	
-	CL_CreateMove_bhop:
-	test [cmd.buttons], IN_JUMP
-	jz .no_bhop
-		test [pmove.flags], FL_ONGROUND
-		jnz .no_bhop
-			cmp [pmove.movetype], MOVETYPE_FLY
-			je .no_bhop
-				cmp [pmove.waterlevel], 2
-				jge .no_bhop
-					and [cmd.buttons], not IN_JUMP
-	.no_bhop:
+	if BHOP
+		CL_CreateMove_bhop:
+		cmp [bhop.value], 0.0
+		je .no_bhop
+			test [cmd.buttons], IN_JUMP
+			jz .no_bhop
+				test [pmove.flags], FL_ONGROUND
+				jnz .no_bhop
+					cmp [pmove.movetype], MOVETYPE_FLY
+					je .no_bhop
+						cmp [pmove.waterlevel], 2
+						jge .no_bhop
+							and [cmd.buttons], not IN_JUMP
+		.no_bhop:
+	end if
 	
 	;pop eax
 	ret

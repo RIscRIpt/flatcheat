@@ -30,6 +30,8 @@ dd AO_GetPlayerMove_Ptr
 dd AO_GetClientDLL_Interface_Version
 
 dd AO_GetConsoleColor
+
+dd AO_GetRegisterVariableMallocCall
 ao_getListEnd:
 
 ;Patterns:
@@ -50,3 +52,5 @@ string szErr_GetClientDLL_IV_notbyte,		'AO_GetClientDLL_Interface_Version found 
 string szErr_GetConsoleColor_CmdClear,		<'AO_GetConsoleColor couldn', "'", 't find address of command "clear"'>
 string szErr_GetConsoleColor_IB,			'AO_GetConsoleColor failed, invalid byte found at 0x19 + "clear" function'
 string szErr_GetConsoleColor_IW,			'AO_GetConsoleColor failed, invalid word found at {0x1A + "clear" function}'
+
+string szErr_GetRegVarMallocCall_IB,		'AO_GetRegisterVariableMallocCall failed, invalid byte found at 0x18 + pfnRegisterVariable'

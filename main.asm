@@ -1,6 +1,4 @@
 proc flatcheat_inject
-	stdcall LoadPrefix
-	
 	stdcall AO_InitWait
 	stdcall AO_GetAll
 	
@@ -12,6 +10,8 @@ proc flatcheat_inject
 	;cinvoke ClientDLL.HUD_Init
 	;stdcall Restore_List, restoreList_Engine
 	
+	;stdcall RegisterCommands
+	stdcall RegisterCvars
 	ret
 endp
 
@@ -47,19 +47,5 @@ proc Restore_List, list
 	add ebx, sizeof.VTRestore_s
 	cmp dword[ebx], 0
 	jne .next
-	ret
-endp
-
-proc LoadPrefix
-	invoke CreateFile, szPrefixFilename, GENERIC_READ, 0, 0, OPEN_EXISTING, 0, 0
-	cmp eax, INVALID_HANDLE_VALUE
-	je .fail ;just ignore the error, default prefix will be used instead.
-	mov esi, eax
-	invoke ReadFile, esi, prefix, sizeof.prefix - 1, 0, 0
-	mov edi, eax
-	invoke CloseHandle, esi
-	test edi, edi
-	jz FatalError
-	.fail:
 	ret
 endp
