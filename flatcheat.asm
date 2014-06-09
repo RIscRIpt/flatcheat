@@ -15,6 +15,7 @@ section '.data' data readable writeable
 	include 'main.inc'
 	include 'auto_offsets.inc'
 	
+	include 'cmds.inc'
 	include 'cvars.inc'
 	include 'local_player_data.inc'
 	include 'clientdll.inc'
@@ -51,11 +52,18 @@ section '.code' code readable writeable executable
 		invoke ExitProcess, 0
 		int3
 	
-	proc ShowFatalError, message
-		invoke MessageBoxA, HWND_DESKTOP, [message], szError, MB_ICONERROR
+	;should be cdecl, but this procedure exits the process
+	ShowFatalError: ;fmt, va_list
+		mov ebp, esp
+		sub esp, 256 ;[ebp - 256] = char buffer[256];
+		mov edi, esp
+		lea ecx, [ebp + 4]
+		invoke vsprintf, edi, [ebp], ecx
+		cmp eax, 0
+		jle FatalError
+		invoke MessageBoxA, HWND_DESKTOP, edi, szError, MB_ICONERROR
 		invoke ExitProcess, 0
 		int3
-	endp
 	
 	include 'utilities.asm'
 
@@ -89,6 +97,7 @@ section '.code' code readable writeable executable
 	include 'main.asm'
 	include 'auto_offsets.asm'
 	
+	include 'cmds.asm'
 	include 'cvars.asm'
 	include 'local_player_data.asm'
 	include 'clientdll.asm'
@@ -96,10 +105,13 @@ section '.code' code readable writeable executable
 
 section '.idata' import data readable writeable
 	library	kernel32,	'kernel32.dll',\
-			user32,		'user32.dll'
+			user32,		'user32.dll',\
+			msvcrt,		'msvcrt.dll'
 	
 	include 'api/kernel32.inc'
 	include 'api/user32.inc'
+	import msvcrt,\
+		vsprintf, 'vsprintf'
 
 	include 'dynapi.inc'
 

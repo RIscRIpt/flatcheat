@@ -3,12 +3,12 @@ macro string name, data {
 	sizeof.#name = $ - name
 }
 
-;macro struct_list list_name, struct_type, [structs] {
-;	common
-;	list_name:
-;	
-;	...
-;	
-;	common
-;	list_name#End:
-;}
+macro jmpcall dest, [arg] { ; push dword arguments and jump to destination
+	common
+    if ~ arg eq
+		reverse
+		pushd arg
+	common
+	end if
+    jmp dest
+}

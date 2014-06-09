@@ -690,9 +690,3 @@ struct Engine_s
 	pfnPlaySound2					dd ?
 	pfnTintRGBA						dd ?
 ends
-
-struct command_s
-	next	dd ?
-	name	dd ?
-	func	dd ?
-ends
