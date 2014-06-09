@@ -27,11 +27,24 @@ proc CL_CreateMove c frametime, _cmd, active
 	end virtual
 	
 	if BHOP
+		display 'Compiling BHOP', 13, 10
 		CL_CreateMove_bhop:
 		cmp [bhop.value], 0.0
 		je .no_bhop
 			test [cmd.buttons], IN_JUMP
 			jz .no_bhop
+				if BHOP_STANDUP
+					display 'Compiling BHOP_STANDUP', 13, 10
+					cmp[bhop_standup.value], 0.0
+					je .no_bhop_standup
+						fldz
+						fld [pmove.flFallVelocity]
+						fcomip ST1
+						fstp ST0
+						jbe .no_bhop_standup
+							or [cmd.buttons], IN_DUCK
+					.no_bhop_standup:
+				end if
 				test [pmove.flags], FL_ONGROUND
 				jnz .no_bhop
 					cmp [pmove.movetype], MOVETYPE_FLY
