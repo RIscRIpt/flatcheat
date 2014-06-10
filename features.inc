@@ -1,6 +1,10 @@
 ;General
 define PREFIX 'fc^'
 
+;Compilation messages
+COMPILING_FEATURE = 1
+COMPILED_FEATURE = 1
+
 ;client.dll {
 	;KreedZ {
 		BHOP = 1

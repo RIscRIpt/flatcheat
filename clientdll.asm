@@ -26,34 +26,29 @@ proc CL_CreateMove c frametime, _cmd, active
 		cmd usercmd_s
 	end virtual
 	
-	if BHOP
-		display 'Compiling BHOP', 13, 10
-		CL_CreateMove_bhop:
+	feature BHOP
 		cmp [bhop.value], 0.0
-		je .no_bhop
+		je .end_BHOP
 			test [cmd.buttons], IN_JUMP
-			jz .no_bhop
-				if BHOP_STANDUP
-					display 'Compiling BHOP_STANDUP', 13, 10
-					cmp[bhop_standup.value], 0.0
-					je .no_bhop_standup
+			jz .end_BHOP
+				feature BHOP_STANDUP
+					cmp [bhop_standup.value], 0.0
+					je .end_BHOP_STANDUP
 						fldz
 						fld [pmove.flFallVelocity]
 						fcomip ST1
 						fstp ST0
-						jbe .no_bhop_standup
+						jbe .end_BHOP_STANDUP
 							or [cmd.buttons], IN_DUCK
-					.no_bhop_standup:
-				end if
+				endf
 				test [pmove.flags], FL_ONGROUND
-				jnz .no_bhop
+				jnz .end_BHOP
 					cmp [pmove.movetype], MOVETYPE_FLY
-					je .no_bhop
+					je .end_BHOP
 						cmp [pmove.waterlevel], 2
-						jge .no_bhop
+						jge .end_BHOP
 							and [cmd.buttons], not IN_JUMP
-		.no_bhop:
-	end if
+	endf
 	
 	;pop eax
 	ret
