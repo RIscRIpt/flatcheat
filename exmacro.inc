@@ -1,5 +1,10 @@
-macro string name, data {
-	name db data, 0
+macro string name, [data] {
+	common
+	name:
+	forward
+	db data
+	common
+	db 0
 	sizeof.#name = $ - name
 }
 

@@ -10,8 +10,6 @@ struct VTRestore_s
 	table_offset dd ?
 ends
 
-szWelcomeMessage db	'flatcheat has been successfully loaded.', 10, 0
-
 align 4
 ClientDLL_Interface_Version dd 0
 
@@ -20,6 +18,8 @@ pConsoleDevColor			dd ? ;ptr to Console text color, when developer = 1
 pushScreenFade				dd ? ;ptr to push OFFSET "ScreenFade"
 pClientDLL					dd ? ;ptr to ClientDLL_s
 pEngine						dd ? ;ptr to Engine_s
+
+pClientSpeed				dd ? ;ptr to Client speed multiplier
 
 pRegVarMallocCall			dd ? ;ptr to pfnRegisterVariable malloc call address
 
@@ -48,3 +48,8 @@ restoreList_Engine:
 	VTRestore_s pEngine, Engine, Engine_s.pfnAddCommand
 	VTRestore_s pEngine, Engine, Engine_s.pfnRegisterVariable
 	dd 0
+
+
+string szWelcomeMessage, 'flatcheat has been successfully loaded.', 10
+
+string szErr_RedirectClientSpeedMultiplierPtr, 'RedirectClientSpeedMultiplierPtr failed.', 13, 10, 'There was not exactly 30 redirections!'

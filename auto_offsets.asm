@@ -136,6 +136,25 @@ proc AO_GetClientDLL_Interface_Version
 	ret
 endp
 
+proc AO_GetClientSpeedMultiplier
+	stdcall FindBytePattern, [hw.base], [hw.size], szTextureLoadMs, sizeof.szTextureLoadMs - 1
+	test eax, eax
+	jnz .found1
+	jmpcall ShowFatalError, szErr_s_FailedToFindXOf_s,\
+		szAO_GetClientSpeedMultiplier, szLocation, szTextureLoadMs
+	.found1:
+	FindRefWithPrefix [hw.base], [hw.size], ASM_INSTR_PUSH_DWORD, sizeof.ASM_INSTR_PUSH_DWORD, eax
+	test eax, eax
+	jnz .found2
+	jmpcall ShowFatalError, szErr_s_FailedToFindXOf_s,\
+		szAO_GetClientSpeedMultiplier, szReference, szTextureLoadMs
+	.found2:
+	sub eax, 7
+	mov eax, [eax]
+	mov [pClientSpeed], eax
+	ret
+endp
+
 proc AO_GetConsoleColor
 	stdcall GetCmdByNameL, szClear, sizeof.szClear
 	test eax, eax

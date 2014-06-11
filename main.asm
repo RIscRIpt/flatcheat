@@ -12,6 +12,8 @@ proc flatcheat_inject
 	
 	;stdcall RegisterCommands
 	stdcall RegisterCvars
+	
+	stdcall RedirectClientSpeedMultiplierPtr
 	ret
 endp
 
@@ -47,5 +49,49 @@ proc Restore_List, list
 	add ebx, sizeof.VTRestore_s
 	cmp dword[ebx], 0
 	jne .next
+	ret
+endp
+
+proc RedirectClientSpeedMultiplierPtr
+	;There should be 30 redirections in total
+	;Plus one more check to ensure that no more redirections are needed
+	local counter dd 30 + 1
+	local result dd ?
+	local oldprot dd ?
+	local searchbase dd ?
+	local searchsize dd ?
+	
+	mov eax, [hw.base]
+	mov ecx, [hw.size]
+	mov [searchbase], eax
+	mov [searchsize], ecx
+	
+	.loop:
+	stdcall FindBytePattern, [searchbase], [searchsize], pClientSpeed, 4
+	test eax, eax
+	jz .not_found		
+		mov [result], eax
+		lea ecx, [oldprot]
+		stdcall VirtualProtect_s, eax, 4, PAGE_EXECUTE_READWRITE, ecx
+		mov eax, [result]
+		mov dword[eax], clientSpeed
+		lea ecx, [oldprot]
+		stdcall VirtualProtect_s, eax, 4, [oldprot], ecx
+		
+		mov eax, [result]
+		add eax, 4
+		mov [searchbase], eax
+		sub eax, [hw.base]
+		sub [searchsize], eax
+		
+		dec [counter]
+		js .fail ;if counter < 0, jmp .fail
+		jmp .loop
+	.not_found:
+		dec [counter]
+		jz .ok
+		.fail:
+		jmpcall ShowFatalError, szErr_RedirectClientSpeedMultiplierPtr
+	.ok:
 	ret
 endp

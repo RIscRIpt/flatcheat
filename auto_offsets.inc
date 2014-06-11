@@ -29,6 +29,8 @@ dd AO_GetClientDLL
 dd AO_GetPlayerMove_Ptr
 dd AO_GetClientDLL_Interface_Version
 
+dd AO_GetClientSpeedMultiplier
+
 dd AO_GetConsoleColor
 
 dd AO_GetRegisterVariableMallocCall
@@ -40,6 +42,7 @@ ao_getListEnd:
 ;Patterns:
 string szClear,								'clear'
 string szScreenFade,						'ScreenFade'
+string szTextureLoadMs,						'Texture load: %6.1fms', 10
 
 ;Error messages:
 string szErr_s_Failed_Invalid_x_at_x_x,		'%s failed, invalid %s:%X found at %08X (should be %X)'
@@ -53,6 +56,7 @@ string szAO_GetEngine,						'AO_GetEngine'
 string szAO_GetClientDLL,					'AO_GetClientDLL'
 string szAO_GetPlayerMove_Ptr,				'AO_GetPlayerMove_Ptr'
 string szAO_GetClientDLL_Interface_Version,	'AO_GetClientDLL_Interface_Version'
+string szAO_GetClientSpeedMultiplier,		'AO_GetClientSpeedMultiplier'
 string szAO_GetConsoleColor,				'AO_GetConsoleColor'
 string szAO_GetRegisterVariableMallocCall,	'AO_GetRegisterVariableMallocCall'
 string szAO_GetRegisterCommandWithFlag,		'AO_GetRegisterCommandWithFlag'

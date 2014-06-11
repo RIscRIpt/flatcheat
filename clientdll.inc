@@ -1,0 +1,1 @@
+clientSpeed dq 1000.0

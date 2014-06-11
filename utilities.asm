@@ -47,7 +47,8 @@ endp
 
 macro FindRefWithPrefix start, size, prefix, prefix_size, address {
 	sub esp, 4 + prefix_size
-	if prefix_size = 1
+	if prefix_size = 0
+	else if prefix_size = 1
 		mov byte[esp], byte prefix
 	else if prefix_size = 2
 		mov word[esp], word prefix
@@ -116,5 +117,5 @@ proc VirtualProtect_s ;lpAddress, dwSize, flNewProtect, lpflOldProtect
 	jnz .orig_ret
 	stdcall ShowFatalError, szErr_VirtualProtect_s
 	.orig_ret:
-	jmp near .orig_ret ;force 4byte jmp, will be modified above
+	jmp near .orig_ret ;force 4byte jmp, (jmp dest is modified above)
 endp
