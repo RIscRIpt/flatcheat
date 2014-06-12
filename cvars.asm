@@ -48,5 +48,6 @@ proc RegisterCvars
 	add esi, sizeof.cvar_s
 	cmp esi, cvarListEnd
 	jne .next
+	stdcall RestoreCvarMallocAddr
 	ret
 endp
