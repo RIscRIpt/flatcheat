@@ -13,6 +13,8 @@
             <File name="cmd_list.inc" />
             <File name="cmds.asm" />
             <File name="cmds.inc" />
+            <File name="cmd_funcs.asm" />
+            <File name="cmd_funcs.inc" />
         </Folder>
         <Folder name="cvars">
             <File name="cvar_list.inc" />
