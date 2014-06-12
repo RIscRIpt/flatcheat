@@ -1,0 +1,53 @@
+<NotepadPlus>
+    <Project name="flatcheat">
+        <File name="features.inc" />
+        <Folder name="auto offsets">
+            <File name="auto_offsets.asm" />
+            <File name="auto_offsets.inc" />
+        </Folder>
+        <Folder name="clientdll">
+            <File name="clientdll.asm" />
+            <File name="clientdll.inc" />
+        </Folder>
+        <Folder name="cmds">
+            <File name="cmd_list.inc" />
+            <File name="cmds.asm" />
+            <File name="cmds.inc" />
+        </Folder>
+        <Folder name="cvars">
+            <File name="cvar_list.inc" />
+            <File name="cvars.asm" />
+            <File name="cvars.inc" />
+        </Folder>
+        <Folder name="dynamic api">
+            <File name="dynapi.asm" />
+            <File name="dynapi.inc" />
+        </Folder>
+        <Folder name="engine">
+            <File name="engine.asm" />
+            <File name="engine.inc" />
+        </Folder>
+        <Folder name="helper scripts">
+            <File name="compile.cmd" />
+            <File name="download_fasm.vbs" />
+        </Folder>
+        <Folder name="local player data">
+            <File name="local_player_data.asm" />
+            <File name="local_player_data.inc" />
+        </Folder>
+        <Folder name="macro">
+            <File name="exmacro.inc" />
+            <File name="print.inc" />
+        </Folder>
+        <Folder name="utilities">
+            <File name="utilities.asm" />
+            <File name="utilities.inc" />
+        </Folder>
+        <File name="cs_types.inc" />
+        <File name="windef.inc" />
+        <File name="hide_dll.asm" />
+        <File name="main.inc" />
+        <File name="main.asm" />
+        <File name="flatcheat.asm" />
+    </Project>
+</NotepadPlus>
