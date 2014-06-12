@@ -20,6 +20,7 @@ section '.data' data readable writeable
 	include 'local_player_data.inc'
 	include 'clientdll.inc'
 	include 'engine.inc'
+	include 'cmd_funcs.inc'
 	
 	include 'utilities.inc'
 
@@ -102,6 +103,7 @@ section '.code' code readable writeable executable
 	include 'local_player_data.asm'
 	include 'clientdll.asm'
 	include 'engine.asm'
+	include 'cmd_funcs.asm'
 
 section '.idata' import data readable writeable
 	library	kernel32,	'kernel32.dll',\
@@ -111,7 +113,8 @@ section '.idata' import data readable writeable
 	include 'api/kernel32.inc'
 	include 'api/user32.inc'
 	import msvcrt,\
-		vsprintf, 'vsprintf'
+		atof,		'atof',\
+		vsprintf,	'vsprintf'
 
 	include 'dynapi.inc'
 

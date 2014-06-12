@@ -8,7 +8,7 @@ ends
 CMD_NAME_DUMP_SIZE = 0
 CMD_DUMP_NAME_OFFSET = 0
 
-macro define_cmd name, func {
+macro define_cmd name {
 	if CMD_PREPROCESS = 1
 		virtual at 0
 			db PREFIX
@@ -18,7 +18,7 @@ macro define_cmd name, func {
 	else
 		name#.next dd ?
 		name#.name dd cmdNameDump + CMD_DUMP_NAME_OFFSET
-		name#.func dd func
+		name#.func dd Command_#name
 		name#.flag dd 0
 		virtual at 0
 			db PREFIX

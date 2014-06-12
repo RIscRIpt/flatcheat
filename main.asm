@@ -10,7 +10,7 @@ proc flatcheat_inject
 	;cinvoke ClientDLL.HUD_Init
 	;stdcall Restore_List, restoreList_Engine
 	
-	;stdcall RegisterCommands
+	stdcall RegisterCommands
 	stdcall RegisterCvars
 	
 	stdcall RedirectClientSpeedMultiplierPtr
