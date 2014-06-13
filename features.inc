@@ -9,5 +9,7 @@ COMPILED_FEATURE = 1
 	;KreedZ {
 		BHOP = 1
 		BHOP_STANDUP = 1
+		
+		JUMPBUG = 1
 	;}
 ;}

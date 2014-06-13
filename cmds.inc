@@ -8,25 +8,45 @@ ends
 CMD_NAME_DUMP_SIZE = 0
 CMD_DUMP_NAME_OFFSET = 0
 
-macro define_cmd name {
+macro define_switch name {
+	define_cmd name, p
+	define_cmd name, m
+}
+
+macro define_cmd name, switch {
 	if CMD_PREPROCESS = 1
 		virtual at 0
+			if switch eq p
+				db '+'
+			else if switch eq m
+				db '-'
+			end if
 			db PREFIX
 			db `name, 0
 			CMD_NAME_DUMP_SIZE = CMD_NAME_DUMP_SIZE + $
 		end virtual
 	else
-		name#.next dd ?
-		name#.name dd cmdNameDump + CMD_DUMP_NAME_OFFSET
-		name#.func dd Command_#name
-		name#.flag dd 0
+		switch#name#.next dd ?
+		switch#name#.name dd cmdNameDump + CMD_DUMP_NAME_OFFSET
+		switch#name#.func dd Command_#name
+		switch#name#.flag dd 0
 		virtual at 0
+			if switch eq p
+				db '+'
+			else if switch eq m
+				db '-'
+			end if
 			db PREFIX
 			db `name, 0
 			sizeof.#name = $
 		end virtual
 		repeat sizeof.#name
 			virtual at 0
+				if switch eq p
+					db '+'
+				else if switch eq m
+					db '-'
+				end if
 				db PREFIX
 				db `name, 0
 				load .b from % - 1
