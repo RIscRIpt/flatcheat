@@ -1,3 +1,4 @@
+define_switch fastrun
 define_switch jumpbug
 define_switch strafe
 define_switch groundstrafe

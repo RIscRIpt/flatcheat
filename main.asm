@@ -114,7 +114,6 @@ proc InitScreenDataLocation
 	mov eax, [screenCenterX]
 	mov ecx, [screenCenterY]
 	mov edx, [screenInfo.iCharHeight]
-	shr edx, 1
 	
 	push dword 0.7
 	fld dword[esp]

@@ -12,6 +12,10 @@ macro define_screen_info type, name {
 
 clientSpeed dq 1000.0
 
+chkftr FASTRUN, <fastrun_movement_angle dd ?>
+chkftr FASTRUN, <fastrun_angle_diff_int dd ?>
+chkftr FASTRUN, <fastrun_sidemove_mul dd ?>
+
 jumpbug_distance dd 2.0
 
 define_screen_info float, HSpeed

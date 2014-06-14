@@ -33,6 +33,73 @@ proc CL_CreateMove c frametime, cmd, active
 	stdcall GetDistanceToGround
 	stdcall GetPlayerSpeed
 	
+	feature FASTRUN
+		bt [userButtons], UB_FASTRUN
+		jnc .end_FASTRUN
+			;TODO: Add multi side support
+			fld [.pmove.velocity.y]
+			fld [.pmove.velocity.x]
+			fpatan
+			;ST0 = atan2(.pmove.velocity.y, .pmove.velocity.x)
+			
+			fld [.cmd.viewangles.y]
+			fmul [flDEG_TO_RAD]
+			fsubp ST1, ST0
+			;ST0 = difference between movement angle and view angle
+			fst ST1
+			fmul [flRAD_TO_DEG]
+			fistp [fastrun_angle_diff_int]		
+			fsincos
+			;ST0 = cos(angle diff)
+			;ST1 = sin(angle diff)
+			fld [fastrun_sidemove.value]
+			
+			mov ecx, 360
+			xor edx, edx
+			mov eax, [fastrun_angle_diff_int]
+			neg eax
+			add eax, ecx
+			div ecx
+			shr ecx, 1
+			cmp edx, ecx
+			ja .pos
+			fchs
+			.pos:
+			stc
+			
+			fld [fastrun_forwardmove.value]
+			fldz
+			fcmovb ST0, ST2
+			fld [fastrun_forwardmove.value]
+			
+			fldz
+			fcmovb ST0, ST6
+			fldz
+			fcmovb ST0, ST6
+			
+			;ST0 = cos(angle diff)
+			;ST1 = sin(angle diff)
+			;ST2 = fastrun_forwardmove.value
+			;ST3 = fastrun_sidemove.value
+			;ST4 = fastrun_forwardmove.value
+			;ST5 = fastrun_sidemove.value
+			;ST6 = cos(angle diff)
+			;ST7 = sin(angle diff)			
+			fmulp ST3, ST0
+			fmulp ST1, ST0
+			fsubp ST1, ST0
+			fstp [.cmd.sidemove]
+			
+			;ST0 = fastrun_forwardmove.value
+			;ST1 = fastrun_sidemove.value
+			;ST2 = cos(angle diff)
+			;ST3 = sin(angle diff)
+			fmulp ST2, ST0
+			fmulp ST2, ST0
+			faddp ST1, ST0
+			fstp [.cmd.forwardmove]
+	endf
+	
 	feature BHOP
 		cmp [bhop.value], 0.0
 		je .end_BHOP

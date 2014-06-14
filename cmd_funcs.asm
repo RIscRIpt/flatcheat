@@ -1,3 +1,15 @@
+proc Command_fastrun
+	cinvoke Engine.Cmd_Argv, 0
+	cmp byte[eax], '+'
+	jne .minus
+	.plus:
+		bts [userButtons], UB_FASTRUN
+		ret
+	.minus:
+		btr [userButtons], UB_FASTRUN
+		ret
+endp
+
 proc Command_jumpbug
 	cinvoke Engine.Cmd_Argv, 0
 	cmp byte[eax], '+'
