@@ -497,6 +497,15 @@ struct playermove_s
 	player_maxs			db (sizeof.vec3_s * 4) dup ?
 ends ;playermove_s
 
+struct SCREENINFO_s
+	iSize		dd sizeof.SCREENINFO_s
+	iWidth		dd ?
+	iHeight		dd ?
+	iFlags		dd ?
+	iCharHeight	dd ?
+	charWidths	dw 256 dup ?
+ends ;SCREENINFO
+
 struct ClientDLL_s
 	Initialize						dd ?
 	HUD_Init						dd ?

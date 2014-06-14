@@ -14,6 +14,9 @@ proc flatcheat_inject
 	stdcall RegisterCvars
 	
 	stdcall RedirectClientSpeedMultiplierPtr
+	
+	stdcall GetScreenInfo
+	stdcall InitScreenDataLocation
 	ret
 endp
 
@@ -93,5 +96,45 @@ proc RedirectClientSpeedMultiplierPtr
 		.fail:
 		jmpcall ShowFatalError, szErr_RedirectClientSpeedMultiplierPtr
 	.ok:
+	ret
+endp
+
+proc GetScreenInfo
+	cinvoke Engine.pfnGetScreenInfo, screenInfo
+	mov eax, [screenInfo.iWidth]
+	mov ecx, [screenInfo.iHeight]
+	shr eax, 1
+	shr ecx, 1
+	mov [screenCenterX], eax
+	mov [screenCenterY], ecx
+	ret
+endp
+
+proc InitScreenDataLocation
+	mov eax, [screenCenterX]
+	mov ecx, [screenCenterY]
+	mov edx, [screenInfo.iCharHeight]
+	shr edx, 1
+	
+	push dword 0.7
+	fld dword[esp]
+	fild [screenInfo.iHeight]
+	fmulp ST1, ST0
+	fistp dword[esp]
+	pop ebx
+	
+	mov [SI_HSpeed_coord.x], eax
+	mov [SI_HSpeed_coord.y], ebx
+	
+	mov [SI_VSpeed_coord.x], eax
+	mov [SI_VSpeed_coord.y], ebx
+	add [SI_VSpeed_coord.y], edx
+	shl edx, 1
+	
+	mov [SI_Height_coord.x], eax
+	mov [SI_Height_coord.y], ebx
+	add [SI_Height_coord.y], edx
+	;shr edx, 1
+	
 	ret
 endp

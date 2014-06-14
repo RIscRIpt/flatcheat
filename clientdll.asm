@@ -1,43 +1,12 @@
-;proc HUD_PlayerMove c ppmove, server
-;	cinvoke ClientDLL.HUD_PlayerMove, [ppmove], [server]
-;	;push eax
-;	
-;	mov ecx, [ppmove]
-;	mov [me.ppmove], ecx
-;	
-;	;pop eax
-;	ret
-;endp
-
-proc GetDistanceToGround
-	local tmp vec3_s ?
-	push edi
-	push esi
+proc HUD_Redraw c time, intermission
+	cinvoke ClientDLL.HUD_Redraw, [time], [intermission]
+	mov [oHUD_Redraw_result], eax
 	
-	lea eax, [pmove.origin]
-	lea edx, [tmp]
+	inline_feature SI_HSPEED, <stdcall WriteDoublCenter, [SI_HSpeed_coord.x], [SI_HSpeed_coord.y], szHSpeed, szHSpeedData, double[me.horizontal_speed]>
+	inline_feature SI_VSPEED, <stdcall WriteDoublCenter, [SI_VSpeed_coord.x], [SI_VSpeed_coord.y], szVSpeed, szVSpeedData, double[me.vertical_speed]>
+	inline_feature SI_HEIGHT, <stdcall WriteDoublCenter, [SI_Height_coord.x], [SI_Height_coord.y], szHeight, szHeightData, double[me.distance_to_ground]>
 	
-	mov ecx, 3
-	mov edi, edx
-	mov esi, eax
-	rep movsd
-	
-	mov [tmp.z], -4096.0
-	
-	cinvoke Engine.PM_TraceLine, eax, edx, 1, 0, -1
-	
-	pop esi
-	pop edi
-	virtual at edi
-		pmove playermove_s
-	end virtual
-	
-	fld [eax + pmtrace_s.fraction]
-	fld [tmp.z]
-	fsub [pmove.origin.z]
-	fmulp ST1, ST0
-	fchs
-	fstp [me.distance_to_ground]
+	mov eax, [oHUD_Redraw_result]
 	ret
 endp
 
@@ -60,6 +29,9 @@ proc CL_CreateMove c frametime, cmd, active
 	virtual at esi
 		.cmd usercmd_s
 	end virtual
+	
+	stdcall GetDistanceToGround
+	stdcall GetPlayerSpeed
 	
 	feature BHOP
 		cmp [bhop.value], 0.0
@@ -85,29 +57,58 @@ proc CL_CreateMove c frametime, cmd, active
 							and [.cmd.buttons], not IN_JUMP
 	endf
 	
+	feature GROUND_STRAFE
+		bt [userButtons], UB_GROUNDSTRAFE
+		jnc .end_GROUND_STRAFE
+			cmp [.pmove.movetype], MOVETYPE_FLY
+			je .end_GROUND_STRAFE
+				test [.pmove.flags], FL_ONGROUND
+				jz .gs_not_on_ground
+					mov_dbl_const clientSpeed, 1.0
+					test [.pmove.flags], FL_DUCKING
+					jnz .gs_not_on_ground
+						cmp [.pmove.bInDuck], 0
+						jne .gs_not_on_ground
+							or [.cmd.buttons], IN_DUCK
+							jmp .end_GROUND_STRAFE
+				.gs_not_on_ground:
+				and [.cmd.buttons], not IN_DUCK
+	endf
+	
+	feature STRAFE
+		bt [userButtons], UB_STRAFE
+		jnc .end_STRAFE
+			fld [strafe_forwardmove.value]
+			fld1
+			fadd [me.horizontal_speed]
+			fdivp ST1, ST0
+			fstp [.cmd.forwardmove]
+			fld [strafe_sidemove.value]
+			fst [.cmd.sidemove]
+			fchs
+			fstp [strafe_sidemove.value]
+	endf
+	
 	feature JUMPBUG
 		bt [userButtons], UB_JUMPBUG
 		jnc .end_JUMPBUG
 			cmp [.pmove.movetype], MOVETYPE_FLY
 			je .end_JUMPBUG
-				stdcall GetDistanceToGround
 				fld [jumpbug_distance]
 				fld [me.distance_to_ground]
 				fcomip ST1
 				fstp ST0
 				ja .jb_prepare
-					fld1
-					fstp [clientSpeed]
+					mov_dbl_const clientSpeed, 1.0
 					and [.cmd.buttons], not IN_DUCK
 					or [.cmd.buttons], IN_JUMP
-					btc [userButtons], UB_JUMPBUG
+					btr [userButtons], UB_JUMPBUG
 					jmp .end_JUMPBUG
 				.jb_prepare:
 					or [.cmd.buttons], IN_DUCK
 					and [.cmd.buttons], not IN_JUMP
-					
 					fld [frametime]
-					fld [pmove.velocity.z]
+					fld [.pmove.velocity.z]
 					fmulp ST1, ST0
 					fchs
 					fld [me.distance_to_ground]

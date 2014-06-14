@@ -1,6 +1,9 @@
 <NotepadPlus>
     <Project name="flatcheat">
-        <File name="features.inc" />
+        <Folder name="features">
+            <File name="feature_math.inc" />
+            <File name="features.inc" />
+        </Folder>
         <Folder name="auto offsets">
             <File name="auto_offsets.asm" />
             <File name="auto_offsets.inc" />
@@ -8,6 +11,10 @@
         <Folder name="clientdll">
             <File name="clientdll.asm" />
             <File name="clientdll.inc" />
+        </Folder>
+        <Folder name="physics calc">
+            <File name="physics_calc.asm" />
+            <File name="physics_calc.inc" />
         </Folder>
         <Folder name="cmds">
             <File name="cmd_list.inc" />
@@ -21,6 +28,10 @@
             <File name="cvars.asm" />
             <File name="cvars.inc" />
         </Folder>
+        <Folder name="drawing">
+            <File name="drawing.asm" />
+            <File name="drawing.inc" />
+        </Folder>
         <Folder name="dynamic api">
             <File name="dynapi.asm" />
             <File name="dynapi.inc" />
@@ -29,13 +40,17 @@
             <File name="engine.asm" />
             <File name="engine.inc" />
         </Folder>
+        <Folder name="opengl">
+            <File name="opengl.asm" />
+            <File name="opengl.inc" />
+        </Folder>
         <Folder name="helper scripts">
             <File name="compile.cmd" />
             <File name="download_fasm.vbs" />
         </Folder>
-        <Folder name="local player data">
-            <File name="local_player_data.asm" />
-            <File name="local_player_data.inc" />
+        <Folder name="player data">
+            <File name="player_data.asm" />
+            <File name="player_data.inc" />
         </Folder>
         <Folder name="macro">
             <File name="exmacro.inc" />

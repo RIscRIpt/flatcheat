@@ -1,11 +1,12 @@
 format PE GUI 5.0 DLL
 
-include 'win32a.inc'
+include 'win32ax.inc'
 include 'windef.inc'
 include 'exmacro.inc'
 include 'print.inc'
 include 'cs_types.inc'
 include 'features.inc'
+include 'feature_math.inc'
 
 entry DllMain
 
@@ -17,9 +18,11 @@ section '.data' data readable writeable
 	
 	include 'cmds.inc'
 	include 'cvars.inc'
-	include 'local_player_data.inc'
+	include 'player_data.inc'
+	include 'physics_calc.inc'
 	include 'clientdll.inc'
 	include 'engine.inc'
+	include 'drawing.inc'
 	include 'cmd_funcs.inc'
 	
 	include 'utilities.inc'
@@ -59,7 +62,7 @@ section '.code' code readable writeable executable
 		sub esp, 256 ;[ebp - 256] = char buffer[256];
 		mov edi, esp
 		lea ecx, [ebp + 4]
-		invoke vsprintf, edi, [ebp], ecx
+		invoke vsprintf, edi, dword[ebp], ecx
 		cmp eax, 0
 		jle FatalError
 		invoke MessageBoxA, HWND_DESKTOP, edi, szError, MB_ICONERROR
@@ -100,9 +103,11 @@ section '.code' code readable writeable executable
 	
 	include 'cmds.asm'
 	include 'cvars.asm'
-	include 'local_player_data.asm'
+	include 'player_data.asm'
+	include 'physics_calc.asm'
 	include 'clientdll.asm'
 	include 'engine.asm'
+	include 'drawing.asm'
 	include 'cmd_funcs.asm'
 
 section '.idata' import data readable writeable
@@ -114,6 +119,8 @@ section '.idata' import data readable writeable
 	include 'api/user32.inc'
 	import msvcrt,\
 		atof,		'atof',\
+		gcvt,		'_gcvt',\
+		sprintf,	'sprintf',\
 		vsprintf,	'vsprintf'
 
 	include 'dynapi.inc'

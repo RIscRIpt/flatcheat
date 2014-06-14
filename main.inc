@@ -27,12 +27,16 @@ pRegisterCommandWithFlag	dd ? ;ptr to RegisterCommand with flag procedure
 pRegCmdWFMallocCall			dd ? ;ptr to RegisterCommand with flag, malloc call address
 
 
-ClientDLL	ClientDLL_s
-Engine		Engine_s
+ClientDLL		ClientDLL_s
+Engine			Engine_s
+
+screenInfo		SCREENINFO_s
+screenCenterX	dd ?
+screenCenterY	dd ?
 
 hookList_ClientDLL:
-	VTHook_s pClientDLL, ClientDLL_s.CL_CreateMove, CL_CreateMove
-	;VTHook_s pClientDLL, ClientDLL_s.HUD_PlayerMove, HUD_PlayerMove
+	chkftr <F_HOOK_HUD_REDRAW>,		<VTHook_s pClientDLL, ClientDLL_s.HUD_Redraw, HUD_Redraw>
+	chkftr <F_HOOK_CL_CREATEMOVE>,	<VTHook_s pClientDLL, ClientDLL_s.CL_CreateMove, CL_CreateMove>
 	dd 0
 
 hookList_Engine:
