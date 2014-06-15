@@ -14,7 +14,7 @@ clientSpeed dq 1000.0
 
 chkftr FASTRUN, <fastrun_movement_angle dd ?>
 chkftr FASTRUN, <fastrun_angle_diff_int dd ?>
-chkftr FASTRUN, <fastrun_sidemove_mul dd ?>
+chkftr FASTRUN, <fastrun_angle_diff_flt dd ?>
 
 jumpbug_distance dd 2.0
 
