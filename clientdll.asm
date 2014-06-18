@@ -40,6 +40,9 @@ proc CL_CreateMove c frametime, cmd, active
 			jz .end_FASTRUN
 			
 			mov eax, dword[.cmd.buttons]
+			test eax, IN_FORWARD or IN_BACK or IN_MOVELEFT or IN_MOVERIGHT
+			jz .end_FASTRUN
+			
 			test eax, IN_FORWARD
 			jz .fr_fwd_bck_ok
 				test eax, IN_BACK
@@ -52,6 +55,7 @@ proc CL_CreateMove c frametime, cmd, active
 				jz .fr_lft_rgt_ok
 					and eax, not (IN_MOVELEFT or IN_MOVERIGHT)
 			.fr_lft_rgt_ok:
+			mov dword[.cmd.buttons], eax
 			
 			test eax, IN_FORWARD
 			jnz .fr_fwd
@@ -60,15 +64,7 @@ proc CL_CreateMove c frametime, cmd, active
 			test eax, IN_MOVERIGHT
 			jnz .fr_rgt
 			test eax, IN_MOVELEFT
-			;jnz .fr_lft
-			;jmp .end_FASTRUN
-			jz .end_FASTRUN
-			.fr_lft:
-				mov [fastrun_movement_angle], 1.5707963267948966192313216916398 ;90.0 * cDEG_TO_RAD
-				jmp .fr_begin
-			.fr_rgt:
-				mov [fastrun_movement_angle], -1.5707963267948966192313216916398 ;-90.0 * cDEG_TO_RAD
-				jmp .fr_begin
+			jnz .fr_lft
 			.fr_fwd:
 				test eax, IN_MOVERIGHT
 				jnz .fr_fwd_rgt
@@ -82,6 +78,12 @@ proc CL_CreateMove c frametime, cmd, active
 				.fr_fwd_lft:
 					mov [fastrun_movement_angle], 0.78539816339744830961566084582005 ;45.0 * cDEG_TO_RAD
 					jmp .fr_begin
+			.fr_lft:
+				mov [fastrun_movement_angle], 1.5707963267948966192313216916398 ;90.0 * cDEG_TO_RAD
+				jmp .fr_begin
+			.fr_rgt:
+				mov [fastrun_movement_angle], -1.5707963267948966192313216916398 ;-90.0 * cDEG_TO_RAD
+				jmp .fr_begin
 			.fr_bck:
 				test eax, IN_MOVELEFT
 				jnz .fr_bck_lft
