@@ -14,7 +14,7 @@ proc GetStringWidth s
 endp
 
 proc WriteDoublCenter x, y, dat, dst, val
-	cinvoke gcvt, double[val], SCREEN_INFO_FLOAT_DIGITS, [dst]
+	cinvoke sprintf, [dst], szFmtDouble, double[val]
 	stdcall GetStringWidth, [dat]
 	shr eax, 1
 	sub [x], eax

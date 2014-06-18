@@ -3,6 +3,17 @@ proc GetDistanceToGround
 	local tmp vec3_s ?
 	local dump dd ? ;vec3_s is 3 dwords length, xmm uses 4 dwords
 
+	virtual at edi
+		.pmove playermove_s
+	end virtual
+	
+	test [.pmove.flags], FL_ONGROUND
+	jz .not_on_ground
+	
+	fldz
+	jmp .ret	
+	
+	.not_on_ground:
 	movups xmm0, [.pmove.origin]
 	movups [tmp], xmm0
 	
@@ -13,15 +24,12 @@ proc GetDistanceToGround
 	
 	cinvoke Engine.PM_TraceLine, eax, edx, 1, 0, -1
 	
-	virtual at edi
-		.pmove playermove_s
-	end virtual
-	
 	fld [eax + pmtrace_s.fraction]
 	fld [tmp.z]
 	fsub [.pmove.origin.z]
 	fmulp ST1, ST0
 	fchs
+	.ret:
 	fstp [me.distance_to_ground]
 	ret
 endp
