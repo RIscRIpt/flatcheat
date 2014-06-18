@@ -119,3 +119,21 @@ proc VirtualProtect_s ;lpAddress, dwSize, flNewProtect, lpflOldProtect
 	.orig_ret:
 	jmp near .orig_ret ;force 4byte jmp, (jmp dest is modified above)
 endp
+
+proc GetRootDir
+	invoke GetModuleFileNameW, [self], rootDir, MAX_PATH
+	test eax, eax
+	jz FatalError
+	
+	std
+	mov ecx, eax
+	shl eax, 1
+	mov edi, rootDir
+	add edi, eax
+	mov ax, '\'
+	repne scasw
+	cld ;WinAPI hangs if DF=1
+
+	mov word[edi + 2], 0
+	ret
+endp

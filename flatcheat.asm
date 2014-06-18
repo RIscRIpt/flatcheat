@@ -13,6 +13,8 @@ entry DllMain
 section '.data' data readable writeable
 	self dd ?
 	hlexe dd ?
+	processHeap dd ?
+	
 	include 'main.inc'
 	include 'auto_offsets.inc'
 	
@@ -27,6 +29,8 @@ section '.data' data readable writeable
 	
 	include 'utilities.inc'
 
+	rootDir dw MAX_PATH + 1 dup 0
+	
 	szError db 'Error', 0
 	szFatalError db	'flatcheat has stopped working', 13, 10,\
 					'Error #'
@@ -81,6 +85,12 @@ section '.code' code readable writeable executable
 		invoke GetCurrentProcess
 		mov [hlexe], eax
 		
+		invoke GetProcessHeap
+		test eax, eax
+		jz FatalError
+		mov [processHeap], eax
+		
+		stdcall GetRootDir
 		stdcall HideDLL
 		stdcall LoadDynamicAPI
 		
@@ -113,15 +123,18 @@ section '.code' code readable writeable executable
 section '.idata' import data readable writeable
 	library	kernel32,	'kernel32.dll',\
 			user32,		'user32.dll',\
+			advapi32,	'advapi32.dll',\
 			msvcrt,		'msvcrt.dll'
 	
 	include 'api/kernel32.inc'
 	include 'api/user32.inc'
+	include 'api/advapi32.inc'
 	import msvcrt,\
 		atof,		'atof',\
 		gcvt,		'_gcvt',\
 		sprintf,	'sprintf',\
-		vsprintf,	'vsprintf'
+		vsprintf,	'vsprintf',\
+		swprintf,	'swprintf'
 
 	include 'dynapi.inc'
 

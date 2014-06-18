@@ -1,3 +1,5 @@
+define_cmd exec
+
 define_switch fastrun
 define_switch jumpbug
 define_switch strafe
