@@ -4,7 +4,7 @@ FASM_Path = "C:\FASM\"
 Dim fileobj : Set fileobj = CreateObject("Scripting.FileSystemObject")
 
 If fileobj.FolderExists(FASM_Path) Then
-	MsgBox "Folder " & FASM_Path & " exists. If you wish to redownload flatassembler," & Chr(13) & Chr(10) & _
+	MsgBox "Folder " & FASM_Path & " exists. If you wish to re-download FASM," & Chr(13) & Chr(10) & _
 		"Delete this directory!", vbError, "FASM was found on your computer"
 	WScript.Quit()
 End If
