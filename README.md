@@ -18,3 +18,6 @@ Counter-Strike 1.6 ring3 cheat written in FASM (flat assembler)
 4. FastRun `NSD`
 5. Bunny Hop (StandUp)
 6. Kreed Info
+
+--
+######Official support website: http://www.riscript.com/
