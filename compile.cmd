@@ -3,7 +3,9 @@ SET compiler=C:\FASM\FASM.EXE
 IF EXIST %compiler% (
 	color 0a
 	SET include=C:\FASM\INCLUDE
+	DEL flatcheat.dll >nul 2>&1
 	%compiler% src/flatcheat.asm
+	MOVE /Y src\flatcheat.dll . >nul 2>&1
 	echo.
 	pause
 ) ELSE (
