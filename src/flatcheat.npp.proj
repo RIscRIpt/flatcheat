@@ -1,0 +1,71 @@
+<NotepadPlus>
+    <Project name="flatcheat">
+        <File name="flatcheat.npp.proj" />
+        <Folder name="features">
+            <File name="feature_math.inc" />
+            <File name="../features.ini" />
+        </Folder>
+        <Folder name="auto offsets">
+            <File name="auto_offsets/auto_offsets.asm" />
+            <File name="auto_offsets/auto_offsets.inc" />
+        </Folder>
+        <Folder name="clientdll">
+            <File name="clientdll/clientdll.asm" />
+            <File name="clientdll/clientdll.inc" />
+        </Folder>
+        <Folder name="calculations">
+            <File name="calculations/physics_calc.asm" />
+            <File name="calculations/physics_calc.inc" />
+        </Folder>
+        <Folder name="fc_cmds">
+            <File name="fc_cmds/cmd_list.inc" />
+            <File name="fc_cmds/cmds.asm" />
+            <File name="fc_cmds/cmds.inc" />
+            <File name="fc_cmds/cmd_funcs.asm" />
+            <File name="fc_cmds/cmd_funcs.inc" />
+        </Folder>
+        <Folder name="fc_cvars">
+            <File name="fc_cvars/cvar_list.inc" />
+            <File name="fc_cvars/cvars.asm" />
+            <File name="fc_cvars/cvars.inc" />
+        </Folder>
+        <Folder name="drawing">
+            <File name="drawing/drawing.asm" />
+            <File name="drawing/drawing.inc" />
+        </Folder>
+        <Folder name="dynamic api">
+            <File name="dynamic_api/dynwinapi.asm" />
+            <File name="dynamic_api/dynwinapi.inc" />
+        </Folder>
+        <Folder name="engine">
+            <File name="engine/engine.asm" />
+            <File name="engine/engine.inc" />
+        </Folder>
+        <Folder name="opengl">
+            <File name="opengl/opengl.asm" />
+            <File name="opengl/opengl.inc" />
+        </Folder>
+        <Folder name="helper scripts">
+            <File name="../compile.cmd" />
+            <File name="../download_fasm.vbs" />
+        </Folder>
+        <Folder name="player data">
+            <File name="player_data/player_data.asm" />
+            <File name="player_data/player_data.inc" />
+        </Folder>
+        <Folder name="macro">
+            <File name="macro/exmacro.inc" />
+            <File name="macro/print.inc" />
+        </Folder>
+        <Folder name="utilities">
+            <File name="utilities/utilities.asm" />
+            <File name="utilities/utilities.inc" />
+        </Folder>
+        <File name="cs_types.inc" />
+        <File name="windef.inc" />
+        <File name="hide_dll.asm" />
+        <File name="main.inc" />
+        <File name="main.asm" />
+        <File name="flatcheat.asm" />
+    </Project>
+</NotepadPlus>

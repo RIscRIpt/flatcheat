@@ -2,10 +2,10 @@ format PE GUI 5.0 DLL
 
 include 'win32ax.inc'
 include 'windef.inc'
-include 'exmacro.inc'
-include 'print.inc'
+include 'macro/exmacro.inc'
+include 'macro/print.inc'
 include 'cs_types.inc'
-include 'features.inc'
+include '../features.ini'
 include 'feature_math.inc'
 
 entry DllMain
@@ -16,18 +16,18 @@ section '.data' data readable writeable
 	processHeap dd ?
 	
 	include 'main.inc'
-	include 'auto_offsets.inc'
+	include 'auto_offsets/auto_offsets.inc'
 	
-	include 'cmds.inc'
-	include 'cvars.inc'
-	include 'player_data.inc'
-	include 'physics_calc.inc'
-	include 'clientdll.inc'
-	include 'engine.inc'
-	include 'drawing.inc'
-	include 'cmd_funcs.inc'
+	include 'fc_cmds/cmds.inc'
+	include 'fc_cvars/cvars.inc'
+	include 'player_data/player_data.inc'
+	include 'calculations/physics_calc.inc'
+	include 'clientdll/clientdll.inc'
+	include 'engine/engine.inc'
+	include 'drawing/drawing.inc'
+	include 'fc_cmds/cmd_funcs.inc'
 	
-	include 'utilities.inc'
+	include 'utilities/utilities.inc'
 
 	rootDir dw MAX_PATH + 1 dup 0
 	
@@ -73,7 +73,7 @@ section '.code' code readable writeable executable
 		invoke ExitProcess, 0
 		int3
 	
-	include 'utilities.asm'
+	include 'utilities/utilities.asm'
 
 	proc DllMain hinstDLL, fdwReason, lpvReserved
 		cmp [fdwReason], DLL_PROCESS_ATTACH ;won't be called with another reason due to HideDLL
@@ -106,19 +106,19 @@ section '.code' code readable writeable executable
 		ret
 	endp
 	
-	include 'dynapi.asm'
+	include 'dynamic_api/dynwinapi.asm'
 	include 'hide_dll.asm'
 	include 'main.asm'
-	include 'auto_offsets.asm'
+	include 'auto_offsets/auto_offsets.asm'
 	
-	include 'cmds.asm'
-	include 'cvars.asm'
-	include 'player_data.asm'
-	include 'physics_calc.asm'
-	include 'clientdll.asm'
-	include 'engine.asm'
-	include 'drawing.asm'
-	include 'cmd_funcs.asm'
+	include 'fc_cmds/cmds.asm'
+	include 'fc_cvars/cvars.asm'
+	include 'player_data/player_data.asm'
+	include 'calculations/physics_calc.asm'
+	include 'clientdll/clientdll.asm'
+	include 'engine/engine.asm'
+	include 'drawing/drawing.asm'
+	include 'fc_cmds/cmd_funcs.asm'
 
 section '.idata' import data readable writeable
 	library	kernel32,	'kernel32.dll',\
@@ -136,6 +136,6 @@ section '.idata' import data readable writeable
 		vsprintf,	'vsprintf',\
 		swprintf,	'swprintf'
 
-	include 'dynapi.inc'
+	include 'dynamic_api/dynwinapi.inc'
 
 section '.reloc' fixups data readable discardable

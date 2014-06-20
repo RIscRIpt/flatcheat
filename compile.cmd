@@ -3,7 +3,7 @@ SET compiler=C:\FASM\FASM.EXE
 IF EXIST %compiler% (
 	color 0a
 	SET include=C:\FASM\INCLUDE
-	%compiler% flatcheat.asm
+	%compiler% src/flatcheat.asm
 	echo.
 	pause
 ) ELSE (
