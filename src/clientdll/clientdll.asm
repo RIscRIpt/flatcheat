@@ -125,19 +125,15 @@ proc CL_CreateMove c frametime, cmd, active
 			ja .pos
 			fchs
 			.pos:
-			stc
-			
+
 			fld [fastrun_forwardmove.value]
-			fldz
-			fcmovb ST0, ST2
+			fld ST1
 			fld [fastrun_forwardmove.value]
 			
 			fld [fastrun_movement_angle]
 			fsincos ;FPU: 0cos, 1sin, 2fwd, 3sid, 4fwd, 5sid
-			fldz
-			fcmovb ST0, ST2
-			fldz
-			fcmovb ST0, ST2
+			fld ST1
+			fld ST1
 			;ST0 = cos(angle diff)
 			;ST1 = sin(angle diff)
 			;ST2 = cos(angle diff)
@@ -164,10 +160,8 @@ proc CL_CreateMove c frametime, cmd, active
 			;ST0 = cos(angle diff)
 			;ST1 = sin(angle diff)
 			
-			fldz
-			fcmovb ST0, ST2
-			fldz
-			fcmovb ST0, ST2
+			fld ST1
+			fld ST1
 			
 			;ST0 = cos(angle diff)
 			;ST1 = sin(angle diff)
