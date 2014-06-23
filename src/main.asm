@@ -14,6 +14,7 @@ proc flatcheat_inject
 	stdcall RegisterCvars
 	
 	stdcall RedirectClientSpeedMultiplierPtr
+	stdcall PatchRefreshFunc
 	
 	stdcall GetScreenInfo
 	stdcall InitScreenDataLocation
@@ -137,6 +138,66 @@ proc InitScreenDataLocation
 	mov [SI_KZ_Height_coord.x], eax
 	mov [SI_KZ_Height_coord.y], ebx
 	;add ebx, edx
+	
+	ret
+endp
+
+; New, patched CPU Disasm
+; Address   Hex dump                    Command                            Comments
+; 038752E0      833D E0528703 00        CMP DWORD PTR DS:[hw.38752E0],0    ; hw.038752E0(guessed void)
+; 038752E7      75 41                   JNE SHORT hw.0387532A
+; 038752E9      55                      PUSH EBP
+; 038752EA      89E5                    MOV EBP,ESP
+; 038752EC      83EC 14                 SUB ESP,14
+; 038752EF      C705 C0626F04 00000000  MOV DWORD PTR DS:[hw.46F62C0],0
+; 038752F9      E8 B2F8FFFF             CALL hw.03874BB0                   ; original can be found at [$ + 0x7C]
+; 038752FE      A1 6C626F04             MOV EAX,DWORD PTR DS:[hw.46F626C]
+; 03875303      85C0                    TEST EAX,EAX
+; 03875305      75 05                   JNE SHORT hw.0387530C
+; 03875307      E8 24EAFFFF             CALL hw.03873D30                   ; original can be found at [$ + 0x8A]
+; 0387530C      E8 DFFEFFFF             CALL hw.038751F0                   ; original can be found at [$ + 0x8F]
+; 03875311      A1 6C626F04             MOV EAX,DWORD PTR DS:[hw.46F626C]
+; 03875316      85C0                    TEST EAX,EAX
+; 03875318      75 0A                   JNE SHORT hw.03875324
+; 0387531A      E8 71E6FFFF             CALL hw.03873990                   ; original can be found at [$ + 0x9D]
+; 0387531F      E8 CCEBFFFF             CALL hw.03873EF0                   ; original can be found at [$ + 0xA2]
+; 03875324      E8 375F0400             CALL hw.038BB260                   ; original can be found at [$ + 0xA7]
+; 03875329      C9                      LEAVE
+; 0387532A      C3                      RETN
+proc PatchRefreshFunc
+	local oldprot dd ?
+	mov esi, refreshFuncPatch
+	mov edi, [pRefreshFunc]
+	add edi, 4
+	xor ecx, ecx
+	.pof_loop:
+		movzx ebx, [refreshFuncPatchOrigFunc + ecx]
+		test ebx, ebx
+		jz .patchedOrigFunc
+		add esi, ebx
+		add edi, ebx
+		mov edx, [pRefreshFuncOrigCalls + ecx * 4]
+		sub edx, edi
+		mov dword[esi], edx
+		inc ecx
+		jmp .pof_loop
+	.patchedOrigFunc:
+	
+	mov dword[refreshFuncPatch + 2], r_norefresh.value
+	mov eax, [pRefreshFuncOrigAddrs + 0*4]
+	mov ecx, [pRefreshFuncOrigAddrs + 1*4]
+	mov dword[refreshFuncPatch + 17], eax
+	mov dword[refreshFuncPatch + 31], ecx
+	mov dword[refreshFuncPatch + 50], ecx
+	
+	lea eax, [oldprot]
+	stdcall VirtualProtect_s, edi, sizeof.refreshFuncPatch, PAGE_EXECUTE_READWRITE, eax
+	mov esi, refreshFuncPatch
+	mov edi, [pRefreshFunc]
+	mov ecx, sizeof.refreshFuncPatch / 4
+	rep movsd
+	lea eax, [oldprot]
+	stdcall VirtualProtect_s, [pRefreshFunc], sizeof.refreshFuncPatch, [oldprot], eax
 	
 	ret
 endp

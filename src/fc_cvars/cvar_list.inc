@@ -9,3 +9,5 @@ define_cvar strafe_sidemove, 35851
 
 define_cvar fastrun_forwardmove, 267.876434
 define_cvar fastrun_sidemove, 135.063748
+
+define_cvar r_norefresh, 0

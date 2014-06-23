@@ -294,3 +294,71 @@ proc AO_GetRegCmdWithFlagMallocCall
 	mov [pRegCmdWFMallocCall], eax
 	ret
 endp
+
+; Original CPU Disasm
+; Address   Hex dump             Command                                       Comments
+; 038752E0  /$  55               PUSH EBP                                      ; hw.038752E0(guessed void)
+; 038752E1  |.  8BEC             MOV EBP,ESP
+; 038752E3  |.  83EC 14          SUB ESP,14
+; 038752E6  |.  D905 90419703    FLD DWORD PTR DS:[hw.3974190]                 ; FLOAT 0.0  [r_norefresh.value]
+; 038752EC  |.  D81D 48B09403    FCOMP DWORD PTR DS:[hw.394B048]               ; FLOAT 0.0  [floatZero]
+; 038752F2  |.  DFE0             FSTSW AX
+; 038752F4  |.  F6C4 44          TEST AH,44
+; 038752F7  |.  0F8A 11010000    JPE hw.0387540E                               ; Taken if ST(0)<[394B048] or operands are unordered in preceding FCOMP at 038752EC
+proc AO_GetRefreshFunc
+	cinvoke Engine.pfnGetCvarPointer, szr_norefresh
+	test eax, eax
+	jnz .found1
+	jmpcall ShowFatalError, szErr_s_FailedToFindXOf_s,\
+		szAO_GetRefreshFunc, szLocation, szr_norefresh
+	.found1:
+	add eax, cvar_s.value
+	mov dword[bpClearFunction + 8], eax
+	stdcall FindBytePattern, [hw.base], [hw.size], bpClearFunction, sizeof.bpClearFunction - 1
+	test eax, eax
+	jnz .found2
+	jmpcall ShowFatalError, szErr_s_FailedToFindXOf_s,\
+		szAO_GetRefreshFunc, szReference, szr_norefresh
+	.found2:
+	mov [pRefreshFunc], eax
+	ret
+endp
+
+proc AO_GetRefreshFuncOrigAddessess
+	mov eax, [pRefreshFunc]
+	xor ecx, ecx
+	.loop1:
+		movzx ebx, [offOrigClearFunctions + ecx]
+		test ebx, ebx
+		jz .done1
+		add eax, ebx
+		cmp byte[eax], ASM_INSTR_CALL
+		je .found1
+		jmpcall ShowFatalError, szErr_s_Failed_Invalid_x_at_x_x,\
+			szAO_GetRefreshFuncOrigAddessess, szByte, [eax], eax, ASM_INSTR_CALL
+		.found1:
+		mov edx, [eax + 1]
+		lea edx, [edx + eax + 5]
+		mov [pRefreshFuncOrigCalls + ecx*4], edx
+		inc ecx
+		jmp .loop1
+	.done1:
+	mov eax, [pRefreshFunc]
+	add eax, 0x71
+	cmp word[eax], ASM_INSTR_MOV_DWORD_PTR_BYTE
+	je .found2
+	jmpcall ShowFatalError, szErr_s_Failed_Invalid_x_at_x_x,\
+		szAO_GetRefreshFuncOrigAddessess, szWord, [eax], eax, ASM_INSTR_MOV_DWORD_PTR_BYTE
+	.found2:
+	mov ecx, [eax + 2]
+	mov [pRefreshFuncOrigAddrs + 0*4], ecx
+	add eax, 0x22
+	cmp byte[eax], ASM_INSTR_MOV_EAX_DWORD_PTR
+	je .found3
+	jmpcall ShowFatalError, szErr_s_Failed_Invalid_x_at_x_x,\
+		szAO_GetRefreshFuncOrigAddessess, szByte, [eax], eax, ASM_INSTR_MOV_EAX_DWORD_PTR
+	.found3:
+	mov ecx, [eax + 1]
+	mov [pRefreshFuncOrigAddrs + 1*4], ecx
+	ret
+endp

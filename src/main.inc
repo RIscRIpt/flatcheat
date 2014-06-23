@@ -21,6 +21,9 @@ pEngine						dd ? ;ptr to Engine_s
 pushErrMsgClDLLStudioRI		dd ? ;ptr to push OFFSET "Couldn't get client .dll studio model rendering interface."
 pEngineStudio				dd ?
 pStudioInterface			dd ?
+pRefreshFunc				dd ? ;ptr to Refresh function (where r_norefresh is checked)
+pRefreshFuncOrigCalls		dd 6 dup ? ;6 original function calls in pRefreshFunc (that are required)
+pRefreshFuncOrigAddrs		dd 2 dup ? ;2 original function addresses in pRefreshFunc
 
 pClientSpeed				dd ? ;ptr to Client speed multiplier
 
@@ -62,4 +65,12 @@ hookList_StudioInterface:
 
 string szWelcomeMessage, 'flatcheat has been successfully loaded.', 10
 
-string szErr_RedirectClientSpeedMultiplierPtr, 'RedirectClientSpeedMultiplierPtr failed.', 13, 10, 'There was not exactly 30 redirections!'
+string szErr_RedirectClientSpeedMultiplierPtr,	'RedirectClientSpeedMultiplierPtr failed.', 13, 10, 'There was not exactly 30 redirections!'
+
+refreshFuncPatchOrigFunc db 26, 14, 5, 14, 5, 5, 0
+refreshFuncPatch db 	$83, $3D, $FF, $FF, $FF, $FF, $00, $75, $41, $55, $89, $E5, $83, $EC, $14, $C7, \
+						$05, $C0, $62, $6F, $04, $00, $00, $00, $00, $E8, $FF, $FF, $FF, $FF, $A1, $6C, \
+						$62, $6F, $04, $85, $C0, $75, $05, $E8, $FF, $FF, $FF, $FF, $E8, $FF, $FF, $FF, \
+						$FF, $A1, $6C, $62, $6F, $04, $85, $C0, $75, $0A, $E8, $FF, $FF, $FF, $FF, $E8, \
+						$FF, $FF, $FF, $FF, $E8, $FF, $FF, $FF, $FF, $C9, $C3, $90
+sizeof.refreshFuncPatch = $ + 1 - refreshFuncPatch
