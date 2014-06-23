@@ -22,6 +22,7 @@ section '.data' data readable writeable
 	include 'fc_cvars/cvars.inc'
 	include 'player_data/player_data.inc'
 	include 'calculations/physics_calc.inc'
+	include 'calculations/intel_approx_math_lib.inc'
 	include 'clientdll/clientdll.inc'
 	include 'engine/engine.inc'
 	include 'drawing/drawing.inc'

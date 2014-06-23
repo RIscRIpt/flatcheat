@@ -2,9 +2,9 @@ proc HUD_Redraw c time, intermission
 	cinvoke ClientDLL.HUD_Redraw, [time], [intermission]
 	mov [oHUD_Redraw_result], eax
 	
-	inline_feature SI_HSPEED, <stdcall WriteDoublCenter, [SI_HSpeed_coord.x], [SI_HSpeed_coord.y], szHSpeed, szHSpeedData, double[me.horizontal_speed]>
-	inline_feature SI_VSPEED, <stdcall WriteDoublCenter, [SI_VSpeed_coord.x], [SI_VSpeed_coord.y], szVSpeed, szVSpeedData, double[me.vertical_speed]>
-	inline_feature SI_HEIGHT, <stdcall WriteDoublCenter, [SI_Height_coord.x], [SI_Height_coord.y], szHeight, szHeightData, double[me.distance_to_ground]>
+	inline_feature SI_KZ_HSPEED, <stdcall WriteDoublCenter, [SI_KZ_HSpeed_coord.x], [SI_KZ_HSpeed_coord.y], szKZ_HSpeed, szKZ_HSpeedData, double[me.horizontal_speed]>
+	inline_feature SI_KZ_VSPEED, <stdcall WriteDoublCenter, [SI_KZ_VSpeed_coord.x], [SI_KZ_VSpeed_coord.y], szKZ_VSpeed, szKZ_VSpeedData, double[me.vertical_speed]>
+	inline_feature SI_KZ_HEIGHT, <stdcall WriteDoublCenter, [SI_KZ_Height_coord.x], [SI_KZ_Height_coord.y], szKZ_Height, szKZ_HeightData, double[me.distance_to_ground]>
 	
 	mov eax, [oHUD_Redraw_result]
 	ret
@@ -15,9 +15,10 @@ endp
 ;in CL_CreateMove 2nd arg (esp + 8) = 049C32D4 (var)
 ;=> ESI = cmd (usercmd_s)
 proc CL_CreateMove c frametime, cmd, active
-	fld [speed.value]
-	fstp [clientSpeed]
-	
+	movss xmm0, [speed.value]
+	cvtss2sd xmm0, xmm0
+	movlpd [clientSpeed], xmm0
+
 	cinvoke ClientDLL.CL_CreateMove, [frametime], [cmd], [active]
 	mov [oCL_CreateMove_result], eax
 	
@@ -189,10 +190,8 @@ proc CL_CreateMove c frametime, cmd, active
 				feature BHOP_STANDUP
 					cmp [bhop_standup.value], 0.0
 					je .end_BHOP_STANDUP
-						fld [bhop_standup_fallingspeed.value]
-						fld [.pmove.flFallVelocity]
-						fcomip ST1
-						fstp ST0
+						movss xmm0, [.pmove.flFallVelocity]
+						comiss xmm0, [bhop_standup_fallingspeed.value]
 						jbe .end_BHOP_STANDUP
 							or dword[.cmd.buttons], IN_DUCK
 				endf
@@ -229,15 +228,15 @@ proc CL_CreateMove c frametime, cmd, active
 			test [.pmove.flags], FL_ONGROUND
 			jnz .end_STRAFE
 			
-			fld [strafe_forwardmove.value]
-			fld1
-			fadd [me.horizontal_speed]
-			fdivp ST1, ST0
-			fstp [.cmd.forwardmove]
-			fld [strafe_sidemove.value]
-			fst [.cmd.sidemove]
-			fchs
-			fstp [strafe_sidemove.value]
+			movlpd xmm1, [me.horizontal_speed]
+			cvtsd2ss xmm1, xmm1
+			addss xmm1, [floatOne]
+			movss xmm0, [strafe_forwardmove.value]
+			divss xmm0, xmm1
+			movss [.cmd.forwardmove], xmm0
+			mov eax, [strafe_sidemove.value]
+			mov [.cmd.sidemove], eax
+			xor [strafe_sidemove.value], 0x80000000 ;change sign
 	endf
 	
 	feature JUMPBUG
@@ -245,31 +244,27 @@ proc CL_CreateMove c frametime, cmd, active
 		jnc .end_JUMPBUG
 			cmp [.pmove.movetype], MOVETYPE_FLY
 			je .end_JUMPBUG
-				fld [jumpbug_distance]
-				fld [me.distance_to_ground]
-				fcomip ST1
-				fstp ST0
+				movlpd xmm1, [me.distance_to_ground]
+				cvtsd2ss xmm1, xmm1
+				comiss xmm1, [jumpbug_distance]
 				ja .jb_prepare
-					mov_dbl_const clientSpeed, 1.0
-					and dword[.cmd.buttons], not IN_DUCK
-					or dword[.cmd.buttons], IN_JUMP
-					btr [userButtons], UB_JUMPBUG
-					jmp .end_JUMPBUG
+						mov_dbl_const clientSpeed, 1.0
+						and dword[.cmd.buttons], not IN_DUCK
+						or dword[.cmd.buttons], IN_JUMP
+						btr [userButtons], UB_JUMPBUG
+						jmp .end_JUMPBUG
 				.jb_prepare:
 					or dword[.cmd.buttons], IN_DUCK
 					and dword[.cmd.buttons], not IN_JUMP
-					fld [frametime]
-					fld [.pmove.velocity.z]
-					fmulp ST1, ST0
-					fchs
-					fld [me.distance_to_ground]
-					fcomip ST1
-					fstp ST0
-					ja .end_JUMPBUG
-						fld1
-						fld [frametime]
-						fdivp ST1, ST0
-						fstp [clientSpeed]
+					movss xmm0, [frametime]
+					mulss xmm0, [.pmove.velocity.z]
+					xorps xmm0, xword[SSE_FLOAT_CHS_MASK]
+					comiss xmm0, xmm1
+					jbe .end_JUMPBUG
+						movss xmm0, [floatOne]
+						divss xmm0, [frametime]
+						cvtss2sd xmm0, xmm0
+						movlpd [clientSpeed], xmm0
 	endf
 	
 	mov eax, [oCL_CreateMove_result]

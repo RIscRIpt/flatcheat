@@ -155,6 +155,47 @@ proc AO_GetClientSpeedMultiplier
 	ret
 endp
 
+proc AO_GetPushHGSMIReference
+	stdcall FindBytePattern, [hw.base], [hw.size], szErrMsgCouldntGetStudioModelRI, sizeof.szErrMsgCouldntGetStudioModelRI - 1
+	test eax, eax
+	jnz .found1
+	jmpcall ShowFatalError, szErr_s_FailedToFindXOf_s,\
+		szAO_GetPushHGSMIReference, szLocation, szErrMsgCouldntGetStudioModelRI
+	.found1:
+	FindRefWithPrefix [hw.base], [hw.size], ASM_INSTR_PUSH_DWORD, sizeof.ASM_INSTR_PUSH_DWORD, eax
+	test eax, eax
+	jnz .found2
+	jmpcall ShowFatalError, szErr_s_FailedToFindXOf_s,\
+		szAO_GetPushHGSMIReference, szReference, szErrMsgCouldntGetStudioModelRI
+	.found2:
+	mov [pushErrMsgClDLLStudioRI], eax
+	ret
+endp
+
+proc AO_GetEngineStudio
+	mov eax, [pushErrMsgClDLLStudioRI]
+	cmp byte[eax - 0x15], ASM_INSTR_PUSH_DWORD
+	je .found
+	jmpcall ShowFatalError, szErr_s_Failed_Invalid_x_at_x_x,\
+		szAO_GetEngineStudio, szByte, [eax], eax, ASM_INSTR_PUSH_DWORD
+	.found:
+	mov eax, [eax - 0x14]
+	mov [pEngineStudio], eax
+	ret
+endp
+
+proc AO_GetStudioModelInterface
+	mov eax, [pushErrMsgClDLLStudioRI]
+	cmp byte[eax - 0x10], ASM_INSTR_PUSH_DWORD
+	je .found
+	jmpcall ShowFatalError, szErr_s_Failed_Invalid_x_at_x_x,\
+		szAO_GetStudioModelInterface, szByte, [eax], eax, ASM_INSTR_PUSH_DWORD
+	.found:
+	mov eax, [eax - 0x0F]
+	mov [pStudioInterface], eax
+	ret
+endp
+
 proc AO_GetConsoleColor
 	stdcall GetCmdByNameL, szClear, sizeof.szClear
 	test eax, eax

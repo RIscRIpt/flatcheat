@@ -18,6 +18,9 @@ pConsoleDevColor			dd ? ;ptr to Console text color, when developer = 1
 pushScreenFade				dd ? ;ptr to push OFFSET "ScreenFade"
 pClientDLL					dd ? ;ptr to ClientDLL_s
 pEngine						dd ? ;ptr to Engine_s
+pushErrMsgClDLLStudioRI		dd ? ;ptr to push OFFSET "Couldn't get client .dll studio model rendering interface."
+pEngineStudio				dd ?
+pStudioInterface			dd ?
 
 pClientSpeed				dd ? ;ptr to Client speed multiplier
 
@@ -53,6 +56,9 @@ restoreList_Engine:
 	VTRestore_s pEngine, Engine, Engine_s.pfnRegisterVariable
 	dd 0
 
+hookList_StudioInterface:
+	;VTHook_s pStudioInterface, StudioInterface
+	dd 0
 
 string szWelcomeMessage, 'flatcheat has been successfully loaded.', 10
 

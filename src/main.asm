@@ -115,25 +115,28 @@ proc InitScreenDataLocation
 	mov ecx, [screenCenterY]
 	mov edx, [screenInfo.iCharHeight]
 	
-	push dword 0.7
+	push dword SI_KZ_LOCATION_X	
+	push dword SI_KZ_LOCATION_Y
 	fld dword[esp]
-	fild [screenInfo.iHeight]
-	fmulp ST1, ST0
+	fld dword[esp + 4]
+	fimul [screenInfo.iWidth]
+	fistp dword[esp + 4]
+	fimul [screenInfo.iHeight]
 	fistp dword[esp]
 	pop ebx
+	pop eax
 	
-	mov [SI_HSpeed_coord.x], eax
-	mov [SI_HSpeed_coord.y], ebx
+	mov [SI_KZ_HSpeed_coord.x], eax
+	mov [SI_KZ_HSpeed_coord.y], ebx
+	add ebx, edx
 	
-	mov [SI_VSpeed_coord.x], eax
-	mov [SI_VSpeed_coord.y], ebx
-	add [SI_VSpeed_coord.y], edx
-	shl edx, 1
+	mov [SI_KZ_VSpeed_coord.x], eax
+	mov [SI_KZ_VSpeed_coord.y], ebx
+	add ebx, edx
 	
-	mov [SI_Height_coord.x], eax
-	mov [SI_Height_coord.y], ebx
-	add [SI_Height_coord.y], edx
-	;shr edx, 1
+	mov [SI_KZ_Height_coord.x], eax
+	mov [SI_KZ_Height_coord.y], ebx
+	;add ebx, edx
 	
 	ret
 endp

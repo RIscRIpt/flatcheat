@@ -5,4 +5,5 @@ struct me_s
 	distance_to_ground dq ?
 ends
 
+align 4
 me me_s

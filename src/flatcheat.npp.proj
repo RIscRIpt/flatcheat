@@ -16,6 +16,8 @@
         <Folder name="calculations">
             <File name="calculations/physics_calc.asm" />
             <File name="calculations/physics_calc.inc" />
+            <File name="calculations\angle_vectors.inc" />
+            <File name="calculations\intel_approx_math_lib.inc" />
         </Folder>
         <Folder name="fc_cmds">
             <File name="fc_cmds/cmd_list.inc" />

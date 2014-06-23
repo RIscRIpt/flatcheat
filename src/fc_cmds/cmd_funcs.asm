@@ -47,13 +47,11 @@ proc Command_groundstrafe
 endp
 
 proc Command_exec
-	define CMD_EXEC_STATE_NL_SEARCH 1
 	local hfile dd ?
 	local bread dd ?
 	local pbuf dd ?
 	local eob dd ?
 	local buflen dd 256
-	local prevstate dd ?
 	local in_quite dd 0
 	cinvoke Engine.Cmd_Argc
 	cmp eax, 2
@@ -131,7 +129,6 @@ proc Command_exec
 				repne scasb
 				je .nl_found
 					;new line not found
-					mov [prevstate], CMD_EXEC_STATE_NL_SEARCH
 					mov ebx, [pbuf]
 					jmp .read_loop
 				.nl_found:
@@ -186,5 +183,4 @@ proc Command_exec
 		cinvoke Engine.Con_Printf, szCmdExecUsage
 	.ret:
 		ret
-	restore CMD_EXEC_STATE_NL_SEARCH
 endp

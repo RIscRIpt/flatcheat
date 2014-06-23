@@ -330,6 +330,13 @@ struct vec3_s
 	z dd ?
 ends ;vec3_s
 
+struct vec4_s
+	x dd ?
+	y dd ?
+	z dd ?
+	w dd ?
+ends ;vec4_s
+
 struct usercmd_s
 	lerp_msec			dw ?
 	msec				dw ?
@@ -698,4 +705,10 @@ struct Engine_s
 	pfnClearArray					dd ?
 	pfnPlaySound2					dd ?
 	pfnTintRGBA						dd ?
+ends
+
+struct StudioInterface_s
+	pVersion			dd ?
+	StudioDrawModel		dd ?
+	StudioDrawPlayer	dd ?
 ends
