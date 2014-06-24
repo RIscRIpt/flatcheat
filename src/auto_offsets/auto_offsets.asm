@@ -362,3 +362,26 @@ proc AO_GetRefreshFuncOrigAddessess
 	mov [pRefreshFuncOrigAddrs + 1*4], ecx
 	ret
 endp
+
+proc AO_GetFuncLimitConnectionCvars
+	stdcall FindBytePattern, [hw.base], [hw.size], szcl_updatereate_min, sizeof.szcl_updatereate_min - 1
+	test eax, eax
+	jnz .found1
+	jmpcall ShowFatalError, szErr_s_FailedToFindXOf_s,\
+		szAO_GetFuncLimitConnectionCvars, szLocation, szcl_updatereate_min
+	.found1:
+	FindRefWithPrefix [hw.base], [hw.size], ASM_INSTR_PUSH_DWORD, sizeof.ASM_INSTR_PUSH_DWORD, eax
+	test eax, eax
+	jnz .found2
+	jmpcall ShowFatalError, szErr_s_FailedToFindXOf_s,\
+		szAO_GetFuncLimitConnectionCvars, szReference, szcl_updatereate_min
+	.found2:
+	sub eax, 0x3A
+	cmp byte[eax], ASM_INSTR_PUSH_EBP
+	je .found3
+	jmpcall ShowFatalError, szErr_s_Failed_Invalid_x_at_x_x,\
+		szAO_GetFuncLimitConnectionCvars, szByte, [eax], eax, ASM_INSTR_PUSH_EBP
+	.found3:
+	mov [pLimitConnectionCvarsFunc], eax
+	ret
+endp

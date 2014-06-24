@@ -46,6 +46,8 @@ dd AO_GetRegCmdWithFlagMallocCall
 
 dd AO_GetRefreshFunc
 dd AO_GetRefreshFuncOrigAddessess
+
+dd AO_GetFuncLimitConnectionCvars
 ao_getListEnd:
 
 ;Patterns:
@@ -55,6 +57,7 @@ string szTextureLoadMs,						'Texture load: %6.1fms', 10
 string szErrMsgCouldntGetStudioModelRI,		"Couldn't get client .dll studio model rendering interface."
 string szr_norefresh,						'r_norefresh'
 string bpClearFunction, $55, $8B, $EC, $83, $EC, $14, $D9, $05, $FF, $FF, $FF, $FF, $D8, $1D, $FF, $FF, $FF, $FF, $DF, $E0, $F6, $C4, $44, $0F, $8A
+string szcl_updatereate_min,				'cl_updaterate minimum is %f'
 
 ;Offsets:
 offOrigClearFunctions db 0x7B, 0x0E, 0x05, 0x0E, 0x05, 0x05, 0x00
@@ -81,6 +84,7 @@ string szAO_GetRegisterCommandWithFlag,		'AO_GetRegisterCommandWithFlag'
 string szAO_GetRegCmdWithFlagMallocCall,	'AO_GetRegCmdWithFlagMallocCall'
 string szAO_GetRefreshFunc,					'AO_GetRefreshFunc'
 string szAO_GetRefreshFuncOrigAddessess,	'AO_GetRefreshFuncOrigAddessess'
+string szAO_GetFuncLimitConnectionCvars,	'AO_GetFuncLimitConnectionCvars'
 
 string szByte,								'byte'
 string szWord,								'word'

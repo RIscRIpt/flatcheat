@@ -15,6 +15,34 @@ macro memcpy dest, src, len {
 	stdcall asm_memcpy
 }
 
+proc FindRefCallAddr start, size, address
+	mov edi, [start]
+	mov edx, [address]
+	mov ecx, [size]
+	sub edx, 4
+	mov al, ASM_INSTR_CALL
+	
+	.cont:
+	repne scasb
+	jne .not_found
+	
+	mov ebx, edx
+	sub ebx, edi
+	cmp dword[edi], ebx
+	je .found
+	
+	;Assume E8 byte cannot be found less than 5 bytes
+	;before another real call instruction
+	add edi, 4
+	jmp .cont
+	
+	.not_found:
+	mov edi, 1
+	.found:
+	lea eax, [edi - 1]
+	ret
+endp
+
 proc FindBytePattern start, size, pattern, pattern_size
 	mov edi, [start]
 	mov edx, [size]
@@ -46,8 +74,7 @@ proc FindBytePattern start, size, pattern, pattern_size
 	.not_found:
 	mov ebx, 1
 	.found:
-	mov eax, ebx
-	dec eax
+	lea eax, [ebx - 1]
 	ret
 endp
 
@@ -80,6 +107,7 @@ macro asm_instr name, value, size {
 	sizeof.ASM_INSTR_#name = size
 }
 
+asm_instr PUSH_EBP,				0x55,	1
 asm_instr PUSH_DWORD,			0x68,	1
 asm_instr PUSH_BYTE,			0x6A,	1
 asm_instr CALL,					0xE8,	1

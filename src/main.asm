@@ -17,6 +17,7 @@ proc flatcheat_inject
 	
 	stdcall RedirectClientSpeedMultiplierPtr
 	stdcall PatchRefreshFunc
+	chkftr PATCH_CONNECTION_CVARS, <stdcall PatchConnectionCvars>
 	
 	stdcall GetScreenInfo
 	stdcall InitScreenDataLocation
@@ -234,3 +235,24 @@ proc PatchRefreshFunc
 	
 	ret
 endp
+
+proc PatchConnectionCvars
+feature PATCH_CONNECTION_CVARS
+	local oldprot dd ?
+	stdcall FindRefCallAddr, [hw.base], [hw.size], [pLimitConnectionCvarsFunc]
+	test eax, eax
+	jnz .found
+	jmpcall ShowFatalError, szErr_FailToFindLimConnCvarsFuncRef
+	.found:
+	mov edi, eax
+	lea eax, [oldprot]
+	stdcall VirtualProtect_s, edi, 5, PAGE_EXECUTE_READWRITE, eax
+	;Patch with 5byte NOP
+	mov byte[edi], 0x66
+	mov dword[edi + 1], 0x90666666
+	lea eax, [oldprot]
+	stdcall VirtualProtect_s, edi, sizeof.refreshFuncPatch, [oldprot], eax
+endf
+	ret
+endp
+

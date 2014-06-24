@@ -30,6 +30,7 @@ pStudioInterface			dd ?
 pRefreshFunc				dd ? ;ptr to Refresh function (where r_norefresh is checked)
 pRefreshFuncOrigCalls		dd 6 dup ? ;6 original function calls in pRefreshFunc (that are required)
 pRefreshFuncOrigAddrs		dd 2 dup ? ;2 original function addresses in pRefreshFunc
+pLimitConnectionCvarsFunc	dd ?
 
 pClientSpeed				dd ? ;ptr to Client speed multiplier
 
@@ -73,17 +74,19 @@ hookList_StudioInterface:
 cvarHookList:
 	CvarHook_s cvar_fps_max + sizeof.PREFIX,			cvar_fps_max,			0
 	CvarHook_s cvar_fps_override + sizeof.PREFIX,		cvar_fps_override,		pCvarFpsOverride
+	CvarHook_s cvar_ex_interp + sizeof.PREFIX,			cvar_ex_interp,			0
 	dd 0
 
 
 string cvar_fps_max,		PREFIX, 'fps_max'
 string cvar_fps_override,	PREFIX, 'fps_override'
-
+string cvar_ex_interp,		PREFIX, 'ex_interp'
 
 string szWelcomeMessage, 'flatcheat has been successfully loaded.', 10
 
 string szErr_FailedToFindCvar_x,				'Failed to find cvar `%s`'
 string szErr_RedirectClientSpeedMultiplierPtr,	'RedirectClientSpeedMultiplierPtr failed.', 13, 10, 'There was not exactly 30 redirections!'
+string szErr_FailToFindLimConnCvarsFuncRef,		'Failed to find LimitConnectionCvars function call reference'
 
 refreshFuncPatchOrigFunc db 26, 14, 5, 14, 5, 5, 0
 refreshFuncPatch db 	$83, $3D, $FF, $FF, $FF, $FF, $00, $75, $41, $55, $89, $E5, $83, $EC, $14, $C7, \
