@@ -31,6 +31,7 @@ pRefreshFunc				dd ? ;ptr to Refresh function (where r_norefresh is checked)
 pRefreshFuncOrigCalls		dd 6 dup ? ;6 original function calls in pRefreshFunc (that are required)
 pRefreshFuncOrigAddrs		dd 2 dup ? ;2 original function addresses in pRefreshFunc
 pLimitConnectionCvarsFunc	dd ?
+pSetinfoJmpPatchPlace		dd ?
 
 pClientSpeed				dd ? ;ptr to Client speed multiplier
 

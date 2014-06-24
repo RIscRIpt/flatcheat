@@ -18,6 +18,7 @@ proc flatcheat_inject
 	stdcall RedirectClientSpeedMultiplierPtr
 	stdcall PatchRefreshFunc
 	chkftr PATCH_CONNECTION_CVARS, <stdcall PatchConnectionCvars>
+	chkftr PATCH_SETINFO, <stdcall PatchSetinfo>
 	
 	stdcall GetScreenInfo
 	stdcall InitScreenDataLocation
@@ -256,3 +257,15 @@ endf
 	ret
 endp
 
+proc PatchSetinfo
+feature PATCH_SETINFO
+	local oldprot dd ?
+	mov edi, [pSetinfoJmpPatchPlace]
+	lea eax, [oldprot]
+	stdcall VirtualProtect_s, edi, 1, PAGE_EXECUTE_READWRITE, eax
+	mov byte[edi], ASM_INSTR_JMP_SHORT
+	lea eax, [oldprot]
+	stdcall VirtualProtect_s, edi, 1, [oldprot], eax
+endf
+	ret
+endp

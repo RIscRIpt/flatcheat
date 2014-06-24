@@ -48,6 +48,7 @@ dd AO_GetRefreshFunc
 dd AO_GetRefreshFuncOrigAddessess
 
 dd AO_GetFuncLimitConnectionCvars
+dd AO_GetSetinfoJmpPatchPlace
 ao_getListEnd:
 
 ;Patterns:
@@ -58,6 +59,7 @@ string szErrMsgCouldntGetStudioModelRI,		"Couldn't get client .dll studio model 
 string szr_norefresh,						'r_norefresh'
 string bpClearFunction, $55, $8B, $EC, $83, $EC, $14, $D9, $05, $FF, $FF, $FF, $FF, $D8, $1D, $FF, $FF, $FF, $FF, $DF, $E0, $F6, $C4, $44, $0F, $8A
 string szcl_updatereate_min,				'cl_updaterate minimum is %f'
+string szCantSetStarKeys,					"Can't set * keys", 10
 
 ;Offsets:
 offOrigClearFunctions db 0x7B, 0x0E, 0x05, 0x0E, 0x05, 0x05, 0x00
@@ -85,6 +87,7 @@ string szAO_GetRegCmdWithFlagMallocCall,	'AO_GetRegCmdWithFlagMallocCall'
 string szAO_GetRefreshFunc,					'AO_GetRefreshFunc'
 string szAO_GetRefreshFuncOrigAddessess,	'AO_GetRefreshFuncOrigAddessess'
 string szAO_GetFuncLimitConnectionCvars,	'AO_GetFuncLimitConnectionCvars'
+string szAO_GetSetinfoJmpPatchPlace,		'AO_GetSetinfoJmpPatchPlace'
 
 string szByte,								'byte'
 string szWord,								'word'

@@ -385,3 +385,26 @@ proc AO_GetFuncLimitConnectionCvars
 	mov [pLimitConnectionCvarsFunc], eax
 	ret
 endp
+
+proc AO_GetSetinfoJmpPatchPlace
+	stdcall FindBytePattern, [hw.base], [hw.size], szCantSetStarKeys, sizeof.szCantSetStarKeys - 1
+	test eax, eax
+	jnz .found1
+	jmpcall ShowFatalError, szErr_s_FailedToFindXOf_s,\
+		szAO_GetSetinfoJmpPatchPlace, szLocation, szCantSetStarKeys
+	.found1:
+	FindRefWithPrefix [hw.base], [hw.size], ASM_INSTR_PUSH_DWORD, sizeof.ASM_INSTR_PUSH_DWORD, eax
+	test eax, eax
+	jnz .found2
+	jmpcall ShowFatalError, szErr_s_FailedToFindXOf_s,\
+		szAO_GetSetinfoJmpPatchPlace, szReference, szCantSetStarKeys
+	.found2:
+	sub eax, 2
+	cmp byte[eax], ASM_INSTR_JNE
+	je .found3
+	jmpcall ShowFatalError, szErr_s_Failed_Invalid_x_at_x_x,\
+		szAO_GetSetinfoJmpPatchPlace, szByte, [eax], eax, ASM_INSTR_JNE
+	.found3:
+	mov [pSetinfoJmpPatchPlace], eax
+	ret
+endp
