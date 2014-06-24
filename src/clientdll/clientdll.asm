@@ -259,6 +259,10 @@ proc CL_CreateMove c frametime, cmd, active
 		jnc .end_JUMPBUG
 			cmp [.pmove.movetype], MOVETYPE_FLY
 			je .end_JUMPBUG
+				xorps xmm0, xmm0
+				comiss xmm0, [.pmove.flFallVelocity]
+				jae .end_JUMPBUG
+				
 				movlpd xmm1, [me.distance_to_ground]
 				cvtsd2ss xmm1, xmm1
 				comiss xmm1, [jumpbug_distance]
@@ -266,7 +270,6 @@ proc CL_CreateMove c frametime, cmd, active
 						mov_dbl_const clientSpeed, 1.0
 						and dword[.cmd.buttons], not IN_DUCK
 						or dword[.cmd.buttons], IN_JUMP
-						btr [userButtons], UB_JUMPBUG
 						jmp .end_JUMPBUG
 				.jb_prepare:
 					or dword[.cmd.buttons], IN_DUCK
