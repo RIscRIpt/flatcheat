@@ -74,6 +74,20 @@ proc Command_groundstrafe
 		ret
 endp
 
+proc Command_groundstrafe_standup
+	cinvoke Engine.Cmd_Argv, 0
+	cmp byte[eax], '+'
+	jne .minus
+	.plus:
+		bts [userButtons], UB_GROUNDSTRAFE
+		bts [userButtons], UB_GROUNDSTRAFE_STANDUP
+		ret
+	.minus:
+		btr [userButtons], UB_GROUNDSTRAFE_STANDUP
+		btr [userButtons], UB_GROUNDSTRAFE
+		ret
+endp
+
 proc Command_exec
 	local hfile dd ?
 	local bread dd ?

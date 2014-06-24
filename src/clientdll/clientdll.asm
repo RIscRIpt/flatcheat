@@ -232,12 +232,32 @@ proc CL_CreateMove c frametime, cmd, active
 				jz .gs_not_on_ground
 					mov_dbl_const clientSpeed, 1.0
 					test [.pmove.flags], FL_DUCKING
-					jnz .gs_not_on_ground
+					jnz .gs_ducking
 						cmp [.pmove.bInDuck], 0
-						jne .gs_not_on_ground
+						jne .gs_ducking
 							or dword[.cmd.buttons], IN_DUCK
 							jmp .end_GROUND_STRAFE
 				.gs_not_on_ground:
+				feature GROUND_STRAFE_STANDUP
+					cmp [groundstrafe_standup.value], 0
+					je .end_GROUND_STRAFE_STANDUP
+					bt [userButtons], UB_GROUNDSTRAFE_STANDUP
+					feature GROUND_STRAFE_STANDUP_CTRL
+						jc .gs_do_standup
+							test [.cmd.buttons], IN_DUCK
+							jz .end_GROUND_STRAFE_STANDUP
+					felse
+						jnc .end_GROUND_STRAFE_STANDUP
+					endf
+					.gs_do_standup:
+						movlpd xmm0, [me.distance_to_ground]
+						cvtsd2ss xmm0, xmm0
+						comiss xmm0, [groundstrafe_standup.value]
+						jbe .end_GROUND_STRAFE_STANDUP
+						or dword[.cmd.buttons], IN_DUCK
+						jmp .end_GROUND_STRAFE
+				endf
+				.gs_ducking:
 				and dword[.cmd.buttons], not IN_DUCK
 	endf
 	
