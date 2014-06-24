@@ -8,9 +8,13 @@ proc HUD_Redraw c time, intermission
 			mov [currentFrameN], ecx
 			mov [r_norefresh.value], 1.0
 		.ret:
-			xor eax, eax
-			leave
-			retn
+			feature FPS_BOOST_SKIP_HUD_REDRAW
+				xor eax, eax
+				leave
+				retn
+			felse
+				jmp .show_frame
+			endf
 		.process_frame:
 			mov [r_norefresh.value], 0.0
 	.show_frame:

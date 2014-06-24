@@ -40,9 +40,9 @@ macro display_space_align str, count {
 
 macro display_feature name, size {
 	local .spaces, .tmp
-	display_space_align szCUR_PROC_NAME, 24
+	display_space_align szCUR_PROC_NAME, 26
 	if ~ size eq
-		display_space_align <': ', `name>, 24
+		display_space_align <': ', `name>, 26
 		display '(', d=(.end_#name - .#name), ' bytes)'
 	else
 		display ': ', `name
@@ -75,6 +75,11 @@ macro inline_feature name, cmd {
 		end if
 		cmd
 	end if
+}
+
+macro felse {
+	endf
+macro finish@feature \{ \}
 }
 
 macro endf {
