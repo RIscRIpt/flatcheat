@@ -17,7 +17,7 @@ Counter-Strike 1.6 ring3 cheat written in FASM (flat assembler)
 3. Ground Strafe `NSD`
 4. FastRun `NSD`
 5. Bunny Hop (StandUp)
-6. Kreed Info
+6. Kreedz Info
 
 --
 ######Official support website: http://www.riscript.com/
