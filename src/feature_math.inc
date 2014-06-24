@@ -100,6 +100,15 @@ virtual at 0
 	sizeof.PREFIX = $
 end virtual
 
+if sizeof.PREFIX <= 0
+	display 13, 10, 13, 10
+	display 9, 9, '   You can not use an empty prefix because of', 13, 10
+	display 9, 9, 'client variable & cheat variable name conflicts.', 13, 10
+	display 9, 9, '       Please edit PREFIX in features.ini', 13, 10
+	display 13, 10, 13, 10
+	err
+end if
+
 F_HOOK_CL_CREATEMOVE = 0
 F_HOOK_HUD_REDRAW = 0
 
