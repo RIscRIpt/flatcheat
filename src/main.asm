@@ -72,6 +72,12 @@ proc Hook_Cvars
 	virtual at eax
 		.cvar cvar_s
 	end virtual
+	cmp [.ch.psave], 0
+	je .skip_save
+		mov ecx, [.ch.psave]
+		lea edx, [.cvar.value]
+		mov [ecx], edx
+	.skip_save:
 	;Replace name
 	mov ecx, [.ch.new_name]
 	mov [.cvar.name], ecx

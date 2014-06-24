@@ -1,5 +1,6 @@
 define_cmd exec
 
+define_switch fps_boost
 define_switch fastrun
 define_switch jumpbug
 define_switch strafe

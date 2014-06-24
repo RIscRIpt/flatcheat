@@ -100,6 +100,9 @@ virtual at 0
 	sizeof.PREFIX = $
 end virtual
 
+F_HOOK_CL_CREATEMOVE = 0
+F_HOOK_HUD_REDRAW = 0
+
 anyftr <\
 	BHOP,\
 	JUMPBUG,\

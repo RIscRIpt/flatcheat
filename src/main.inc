@@ -13,6 +13,7 @@ ends
 struct CvarHook_s
 	org_name dd ?
 	new_name dd ?
+	psave dd ?
 ends
 
 align 4
@@ -37,6 +38,7 @@ pRegVarMallocCall			dd ? ;ptr to pfnRegisterVariable malloc call address
 pRegisterCommandWithFlag	dd ? ;ptr to RegisterCommand with flag procedure
 pRegCmdWFMallocCall			dd ? ;ptr to RegisterCommand with flag, malloc call address
 
+pCvarFpsOverride			dd ? ;ptr to `fps_override` cvar_s
 
 ClientDLL		ClientDLL_s
 Engine			Engine_s
@@ -69,8 +71,8 @@ hookList_StudioInterface:
 	dd 0
 
 cvarHookList:
-	CvarHook_s cvar_fps_max + sizeof.PREFIX,			cvar_fps_max
-	CvarHook_s cvar_fps_override + sizeof.PREFIX,		cvar_fps_override
+	CvarHook_s cvar_fps_max + sizeof.PREFIX,			cvar_fps_max,			0
+	CvarHook_s cvar_fps_override + sizeof.PREFIX,		cvar_fps_override,		pCvarFpsOverride
 	dd 0
 
 

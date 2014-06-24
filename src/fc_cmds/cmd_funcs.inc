@@ -4,12 +4,16 @@ macro define_ub name {
 	UB_COUNT = UB_COUNT + 1
 }
 
+define_ub UB_FPS_BOOST
 define_ub UB_FASTRUN
 define_ub UB_JUMPBUG
 define_ub UB_STRAFE
 define_ub UB_GROUNDSTRAFE
 
 userButtons dd ?
+
+currentFrameN dd 0
+showFrameN dd 0
 
 unicodeBuffer dw 256 dup 0
 sizeof.unicodeBuffer = $ - unicodeBuffer

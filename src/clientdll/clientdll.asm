@@ -1,4 +1,19 @@
 proc HUD_Redraw c time, intermission
+	bt [userButtons], UB_FPS_BOOST
+	jnc .show_frame
+		dec [currentFrameN]
+		jz .process_frame
+		jns .ret
+			mov ecx, [showFrameN]
+			mov [currentFrameN], ecx
+			mov [r_norefresh.value], 1.0
+		.ret:
+			xor eax, eax
+			leave
+			retn
+		.process_frame:
+			mov [r_norefresh.value], 0.0
+	.show_frame:
 	cinvoke ClientDLL.HUD_Redraw, [time], [intermission]
 	mov [oHUD_Redraw_result], eax
 	

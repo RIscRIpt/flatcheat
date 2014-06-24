@@ -1,3 +1,27 @@
+proc Command_fps_boost
+	cinvoke Engine.Cmd_Argv, 0
+	cmp byte[eax], '+'
+	jne .minus
+	.plus:
+		mov edx, 1.0
+		cvtss2si eax, [fps_boost_skip_nframes.value]
+		shl eax, 1 ;make it even (screen is not refreshed when it's odd)
+		mov [showFrameN], eax
+		mov [currentFrameN], eax
+		mov [r_norefresh.value], edx
+		bts [userButtons], UB_FPS_BOOST
+		mov ecx, [pCvarFpsOverride]
+		mov [ecx], edx
+		ret
+	.minus:
+		mov [r_norefresh.value], 0.0
+		btr [userButtons], UB_FPS_BOOST
+		xor eax, eax
+		mov ecx, [pCvarFpsOverride]
+		mov [ecx], eax
+		ret
+endp
+
 proc Command_fastrun
 	cinvoke Engine.Cmd_Argv, 0
 	cmp byte[eax], '+'
@@ -28,9 +52,13 @@ proc Command_strafe
 	jne .minus
 	.plus:
 		bts [userButtons], UB_STRAFE
+		cmp [strafe_use_fps_boost.value], 0
+		jne Command_fps_boost.plus
 		ret
 	.minus:
 		btr [userButtons], UB_STRAFE
+		cmp [strafe_use_fps_boost.value], 0
+		jne Command_fps_boost.minus
 		ret
 endp
 
