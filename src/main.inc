@@ -10,6 +10,11 @@ struct VTRestore_s
 	table_offset dd ?
 ends
 
+struct CvarHook_s
+	org_name dd ?
+	new_name dd ?
+ends
+
 align 4
 ClientDLL_Interface_Version dd 0
 
@@ -63,8 +68,19 @@ hookList_StudioInterface:
 	;VTHook_s pStudioInterface, StudioInterface
 	dd 0
 
+cvarHookList:
+	CvarHook_s cvar_fps_max + sizeof.PREFIX,			cvar_fps_max
+	CvarHook_s cvar_fps_override + sizeof.PREFIX,		cvar_fps_override
+	dd 0
+
+
+string cvar_fps_max,		PREFIX, 'fps_max'
+string cvar_fps_override,	PREFIX, 'fps_override'
+
+
 string szWelcomeMessage, 'flatcheat has been successfully loaded.', 10
 
+string szErr_FailedToFindCvar_x,				'Failed to find cvar `%s`'
 string szErr_RedirectClientSpeedMultiplierPtr,	'RedirectClientSpeedMultiplierPtr failed.', 13, 10, 'There was not exactly 30 redirections!'
 
 refreshFuncPatchOrigFunc db 26, 14, 5, 14, 5, 5, 0

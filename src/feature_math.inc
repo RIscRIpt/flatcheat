@@ -95,6 +95,10 @@ macro epilogue_restore_cur_proc procname, flag, parmbytes, localbytes, reglist {
 prologue@proc equ prologue_define_cur_proc
 epilogue@proc equ epilogue_restore_cur_proc
 
+virtual at 0
+	db PREFIX
+	sizeof.PREFIX = $
+end virtual
 
 anyftr <\
 	BHOP,\

@@ -10,6 +10,8 @@ proc flatcheat_inject
 	;cinvoke ClientDLL.HUD_Init
 	;stdcall Restore_List, restoreList_Engine
 	
+	stdcall Hook_Cvars
+	
 	stdcall RegisterCommands
 	stdcall RegisterCvars
 	
@@ -51,6 +53,31 @@ proc Restore_List, list
 	mov edx, [edx + ecx]
 	mov [eax + ecx], edx
 	add ebx, sizeof.VTRestore_s
+	cmp dword[ebx], 0
+	jne .next
+	ret
+endp
+
+proc Hook_Cvars
+	mov ebx, cvarHookList
+	virtual at ebx
+		.ch CvarHook_s
+	end virtual
+	.next:
+	cinvoke Engine.pfnGetCvarPointer, [.ch.org_name]
+	test eax, eax
+	jnz .found
+	jmpcall ShowFatalError, szErr_FailedToFindCvar_x, [.ch.org_name]
+	.found:
+	virtual at eax
+		.cvar cvar_s
+	end virtual
+	;Replace name
+	mov ecx, [.ch.new_name]
+	mov [.cvar.name], ecx
+	;Create fake cvar with original name
+	cinvoke Engine.pfnRegisterVariable, [.ch.org_name], [.cvar..string], 0
+	add ebx, sizeof.CvarHook_s
 	cmp dword[ebx], 0
 	jne .next
 	ret
