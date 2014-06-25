@@ -14,9 +14,9 @@ Counter-Strike 1.6 ring3 cheat written in FASM (flat assembler)
 ### Features:
 1. Strafes Hack (*Max8w*)
 2. JumpBug Hack
-3. Ground Strafe `NSD`
+3. Ground Strafe `NSD` (+StandUp)
 4. FastRun `NSD`
-5. Bunny Hop (StandUp)
+5. Bunny Hop (+StandUp)
 6. Kreedz Info
 
 --
