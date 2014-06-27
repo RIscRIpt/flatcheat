@@ -324,6 +324,13 @@ IN_RELOAD					= 1 shl 13
 IN_ALT1						= 1 shl 14
 IN_SCORE					= 1 shl 15
 
+HISTORY_MAX					= 64 ;Must be power of 2
+
+struct vec2_s
+	x dd ?
+	y dd ?
+ends ;vec2_s
+
 struct vec3_s
 	x dd ?
 	y dd ?
@@ -504,6 +511,215 @@ struct playermove_s
 	player_maxs			db (sizeof.vec3_s * 4) dup ?
 ends ;playermove_s
 
+struct color24_s
+	r dw ?
+	g dw ?
+	b dw ?
+ends ;color24_s
+
+struct colorVec
+	r dd ?
+	g dd ?
+	b dd ?
+	a dd ?
+ends
+
+struct entity_state_s
+	;Fields which are filled in by routines outside of delta compression
+	entityType			dd ?
+
+	;Index into cl_entities array for this entity.
+	number				dd ?
+	msg_time			dd ?
+
+	;Message number last time the player/entity state was updated.
+	messagenum			dd ?
+
+	;Fields which can be transitted and reconstructed over the network stream
+	origin				vec3_s
+	angles				vec3_s
+
+	modelindex			dd ?
+	sequence			dd ?
+	frame				dd ?
+	colormap			dd ?
+	skin				dw ?
+	solid				dw ?
+	effects				dd ?
+	scale				dd ?
+
+	eflags				dw ?
+
+	;Render information
+	rendermode			dd ?
+	renderamt			dd ?
+	rendercolor			color24_s
+	renderfx			dd ?
+
+	movetype			dd ?
+	animtime			dd ?
+	framerate			dd ?
+	body				dd ?
+	controller			db 4 dup ?
+	blending			db 4 dup ?
+	velocity			vec3_s
+
+	;Send bbox down to client for use during prediction.
+	mins				vec3_s
+	maxs				vec3_s
+
+	aiment				dd ?
+
+	;If owned by a player, the index of that player ( for projectiles ).
+	owner				dd ?
+
+	;Friction, for prediction.
+	friction			dd ?       
+	;Gravity multiplier
+	gravity				dd ?		
+
+	;PLAYER SPECIFIC
+	team				dd ?
+	playerclass			dd ?
+	health				dd ?
+	spectator			dd ?  
+	weaponmodel			dd ?
+	gaitsequence		dd ?
+	;If standing on conveyor, e.g.
+	basevelocity		vec3_s   
+	;Use the crouched hull, or the regular player hull.
+	usehull				dd ?		
+	;Latched buttons last time state updated.
+	oldbuttons			dd ?     
+	;-1 = in air, else pmove entity number
+	onground			dd ?		
+	iStepLeft			dd ?
+	;How fast we are falling
+	flFallVelocity		dd ?  
+
+	fov					dd ?
+	weaponanim			dd ?
+
+	;Parametric movement overrides
+	startpos			vec3_s
+	endpos				vec3_s
+	impacttime			dd ?
+	starttime			dd ?
+
+	;For mods
+	iuser1				dd ?
+	iuser2				dd ?
+	iuser3				dd ?
+	iuser4				dd ?
+	fuser1				dd ?
+	fuser2				dd ?
+	fuser3				dd ?
+	fuser4				dd ?
+	vuser1				vec3_s
+	vuser2				vec3_s
+	vuser3				vec3_s
+	vuser4				vec3_s
+ends ;entity_state_s
+
+struct mouth_s
+	mouthopen			dw ? ;0 = mouth closed, 255 = mouth agape
+	sndcount			dw ? ;counter for running average
+	sndavg				dd ? ;running average
+ends
+
+struct latchedvars_s
+	prevanimtime		dd ?  
+	sequencetime		dd ?
+	prevseqblending		dw 2 dup ?
+	prevorigin			vec3_s
+	prevangles			vec3_s
+
+	prevsequence		dd ?
+	prevframe			dd ?
+
+	prevcontroller		db 4 dup ?
+	prevblending		dw 2 dup ?
+ends ;latchedvars_s
+
+struct model_s
+	name				db 64 dup ?
+	needload			dd ? ;bmodels and sprites don't cache normally
+	
+	type				dd ?
+	numframes			dd ?
+	synctype			dd ?
+	
+	flags				dd ?
+	
+	mins				vec3_s
+	maxs				vec3_s
+ends ;model_s
+
+struct efrag_s
+	leaf				dd ? ;mleaf_s*
+	leafnext			dd ? ;efrag_s*
+	entity				dd ? ;cl_entity_s*
+	entnext				dd ? ;efrag_s*
+ends ;efrag_s
+
+struct mnode_s
+	;common with leaf
+	contents			dd ? ;0, to differentiate from leafs
+	visframe			dd ? ;node needs to be traversed if current
+
+	minmaxs				dw 6 dup ? ;for bounding box culling
+
+	parent				dd ? ;mnode_s*
+
+	;node specific
+	plane				dd ? ;mplane_s*
+	children			dd 2 dup ? ;mnode_s*
+
+	firstsurface		dw ?
+	numsurfaces			dw ?
+ends ;mnode_s
+
+struct position_history_s
+	animtime			dd ? ;Time stamp for this movement
+	origin				vec3_s
+	angles				vec3_s
+ends ;position_history_s
+
+struct cl_entity_s
+	index				dd ? ;Index into cl_entities ( should match actual slot, but not necessarily )
+	player				dd ? ;True if this entity is a "player"
+
+	baseline			entity_state_s ;The original state from which to delta during an uncompressed message
+	prevstate			entity_state_s ;The state information from the penultimate message received from the server
+	curstate			entity_state_s ;The state information from the last message received from server
+
+	current_position	dd ? ;Last received history update index
+	ph					db (sizeof.position_history_s * HISTORY_MAX) dup ? ;History of position and angle updates for this player
+	
+	mouth				mouth_s ; For synchronizing mouth movements.
+
+	latched				latchedvars_s ;Variables used by studio model rendering routines
+
+	;Information based on interplocation, extrapolation, prediction, or just copied from last msg received.
+	lastmove			dd ?
+
+	;Actual render position and angles
+	origin				vec3_s
+	angles				vec3_s
+
+	attachment			db (sizeof.vec3_s * 4) dup ? ;Attachment points
+
+	trivial_accept		dd ? ;Other entity local information
+
+	model				model_s ;cl.model_precache[ curstate.modelindes ];  all visible entities have a model
+	efrag				efrag_s ;linked list of efrags
+	topnode				mnode_s ;for bmodels, first world node that splits bmodel, or NULL if not split
+	
+	syncbase			dd ? ;for client-side animations -- used by obsolete alias animation system, remove?
+	visframe			dd ? ;last frame this entity was found in an active leaf
+	cvFloorColor		colorVec
+ends ;cl_entity_s
+
 struct SCREENINFO_s
 	iSize		dd sizeof.SCREENINFO_s
 	iWidth		dd ?
@@ -572,6 +788,24 @@ struct NET_API_s
 	RemoveKey						dd ?
 	SetValueForKey					dd ?
 ends
+
+struct triangleapi_s
+	version							dd ?
+	RenderMode						dd ? ;void: int mode
+	Begin							dd ? ;void: int primitiveCode
+	End								dd ? ;void: void
+	Color4f 						dd ? ;void: float r, float g, float b, float a
+	Color4ub 						dd ? ;void: unsigned char r, unsigned char g, unsigned char b, unsigned char a
+	TexCoord2f 						dd ? ;void: float u, float v
+	Vertex3fv 						dd ? ;void: float *worldPnt
+	Vertex3f 						dd ? ;void: float x, float y, float z
+	Brightness 						dd ? ;void: float brightness
+	CullFace 						dd ? ;void: TRICULLSTYLE style
+	SpriteTexture 					dd ? ;int: struct model_s *pSpriteModel, int frame
+	WorldToScreen					dd ? ;int: float *world, float *screen ;Returns 1 if it's z clipped
+	Fog 							dd ? ;void: float flFogColor[3], float flStart, float flEnd, int bOn ;//Works just like GL_FOG, flFogColor is r/g/b.
+	ScreenToWorld					dd ? ;void: float *screen, float *world
+ends ;triangleapi_s
 
 struct Engine_s
 	pfnSPR_Load						dd ?
