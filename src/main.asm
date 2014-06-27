@@ -17,6 +17,7 @@ proc flatcheat_inject
 	
 	stdcall RedirectClientSpeedMultiplierPtr
 	stdcall PatchRefreshFunc
+	stdcall PatchWorldToScreen
 	chkftr PATCH_CONNECTION_CVARS, <stdcall PatchConnectionCvars>
 	chkftr PATCH_SETINFO, <stdcall PatchSetinfo>
 	
@@ -141,14 +142,15 @@ proc GetScreenInfo
 	mov ecx, [screenInfo.iHeight]
 	shr eax, 1
 	shr ecx, 1
-	mov [screenCenterX], eax
-	mov [screenCenterY], ecx
+	cvtsi2ss xmm0, eax
+	cvtsi2ss xmm1, ecx
+	movss [flScreenCenter.x], xmm0
+	movss [flScreenCenter.y], xmm1
+	bts [flScreenCenter.y], 31 ;make value negative (required for CalcScreen)
 	ret
 endp
 
 proc InitScreenDataLocation
-	mov eax, [screenCenterX]
-	mov ecx, [screenCenterY]
 	mov edx, [screenInfo.iCharHeight]
 	
 	push dword SI_KZ_LOCATION_X	
@@ -267,5 +269,39 @@ feature PATCH_SETINFO
 	lea eax, [oldprot]
 	stdcall VirtualProtect_s, edi, 1, [oldprot], eax
 endf
+	ret
+endp
+
+proc PatchWorldToScreen
+	local oldprot dd ?
+	local base dd ?
+	local sizeleft dd ?
+	
+	mov eax, [pViewMatrix]
+	mov [WorldToScreen.patch_addr], eax
+	mov [CalcScreen.patch_addr], eax
+	
+	;Redirect all WorldToScreen calls to our SSE4 version
+	mov ecx, [hw.size]
+	mov edi, [hw.base]
+	mov [sizeleft], ecx
+	mov [base], edi
+	.loop:
+		stdcall FindRefCallAddr, [base], [sizeleft], [pWorldToScreen]
+		test eax, eax
+		jz .done
+		mov [sizeleft], ecx ;FindRefCallAddr uses ecx only for scasb
+		lea edi, [eax + 1]
+		lea ebx, [oldprot]
+		stdcall VirtualProtect_s, edi, 4, PAGE_EXECUTE_READWRITE, ebx
+		mov dword[edi], WorldToScreen - 4
+		sub dword[edi], edi
+		lea ebx, [oldprot]
+		stdcall VirtualProtect_s, edi, 4, [oldprot], ebx
+		add edi, 4
+		sub [sizeleft], 4
+		mov [base], edi
+		jmp .loop
+	.done:
 	ret
 endp

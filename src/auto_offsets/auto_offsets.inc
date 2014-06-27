@@ -49,6 +49,8 @@ dd AO_GetRefreshFuncOrigAddessess
 
 dd AO_GetFuncLimitConnectionCvars
 dd AO_GetSetinfoJmpPatchPlace
+
+dd AO_GetWorldToScreenViewMatrix
 ao_getListEnd:
 
 ;Patterns:
@@ -88,6 +90,7 @@ string szAO_GetRefreshFunc,					'AO_GetRefreshFunc'
 string szAO_GetRefreshFuncOrigAddessess,	'AO_GetRefreshFuncOrigAddessess'
 string szAO_GetFuncLimitConnectionCvars,	'AO_GetFuncLimitConnectionCvars'
 string szAO_GetSetinfoJmpPatchPlace,		'AO_GetSetinfoJmpPatchPlace'
+string szAO_GetWorldToScreenViewMatrix,		'AO_GetWorldToScreenViewMatrix'
 
 string szByte,								'byte'
 string szWord,								'word'

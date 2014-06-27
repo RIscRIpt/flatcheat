@@ -24,5 +24,6 @@ chkftr SI_KZ_HEIGHT, <define_screen_info float, KZ_Height, 'Height'>
 
 oHUD_Redraw_result dd ?
 oCL_CreateMove_result dd ?
+oHUD_AddEntity_result dd ?
 
 floatOne dd 1.0

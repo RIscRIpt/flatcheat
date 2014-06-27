@@ -32,6 +32,8 @@ pRefreshFuncOrigCalls		dd 6 dup ? ;6 original function calls in pRefreshFunc (th
 pRefreshFuncOrigAddrs		dd 2 dup ? ;2 original function addresses in pRefreshFunc
 pLimitConnectionCvarsFunc	dd ?
 pSetinfoJmpPatchPlace		dd ?
+pViewMatrix					dd ? ;(not sure if it's really viewmatrix) used in WorldToScreen (and CalcScreen)
+pWorldToScreen				dd ? ;ptr to original function WorldToScreen (in hw.dll)
 
 pClientSpeed				dd ? ;ptr to Client speed multiplier
 
@@ -52,6 +54,7 @@ screenCenterY	dd ?
 hookList_ClientDLL:
 	chkftr <F_HOOK_HUD_REDRAW>,		<VTHook_s pClientDLL, ClientDLL_s.HUD_Redraw, HUD_Redraw>
 	chkftr <F_HOOK_CL_CREATEMOVE>,	<VTHook_s pClientDLL, ClientDLL_s.CL_CreateMove, CL_CreateMove>
+	chkftr <F_HOOK_HUD_ADDENTITY>,	<VTHook_s pClientDLL, ClientDLL_s.HUD_AddEntity, HUD_AddEntity>
 	dd 0
 
 hookList_Engine:

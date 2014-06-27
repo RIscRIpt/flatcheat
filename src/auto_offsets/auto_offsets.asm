@@ -408,3 +408,26 @@ proc AO_GetSetinfoJmpPatchPlace
 	mov [pSetinfoJmpPatchPlace], eax
 	ret
 endp
+
+proc AO_GetWorldToScreenViewMatrix
+	mov eax, [Engine.pTriAPI]
+	mov eax, [eax + triangleapi_s.WorldToScreen]
+	add eax, 0x0B
+	cmp byte[eax], ASM_INSTR_CALL
+	je .found1
+	jmpcall ShowFatalError, szErr_s_Failed_Invalid_x_at_x_x,\
+		szAO_GetWorldToScreenViewMatrix, szByte, [eax], eax, ASM_INSTR_CALL
+	.found1:
+	add eax, [eax + 1]
+	add eax, 5
+	mov [pWorldToScreen], eax
+	add eax, 0x0A
+	cmp word[eax], ASM_INSTR_FLD_DWORD_PTR
+	je .found2
+	jmpcall ShowFatalError, szErr_s_Failed_Invalid_x_at_x_x,\
+		szAO_GetWorldToScreenViewMatrix, szWord, [eax], eax, ASM_INSTR_FLD_DWORD_PTR
+	.found2:
+	mov eax, [eax + 2]
+	mov [pViewMatrix], eax
+	ret
+endp

@@ -34,6 +34,7 @@ proc FindRefCallAddr start, size, address
 	;Assume E8 byte cannot be found less than 5 bytes
 	;before another real call instruction
 	add edi, 4
+	sub ecx, 4
 	jmp .cont
 	
 	.not_found:
@@ -114,6 +115,7 @@ asm_instr CALL,					0xE8,	1
 asm_instr JMP,					0xE9,	1
 asm_instr JMP_SHORT,			0xEB,	1
 asm_instr JNE,					0x75,	1
+asm_instr MOV_EDX_DWORD,		0xBA,	1
 asm_instr MOV_EAX_DWORD_PTR, 	0xA1,	1
 asm_instr MOV_ECX_DWORD_PTR,	0x0D8B,	2
 asm_instr CALL_DWORD_PTR,		0x15FF,	2

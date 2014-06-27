@@ -123,6 +123,7 @@ end if
 
 F_HOOK_CL_CREATEMOVE = 0
 F_HOOK_HUD_REDRAW = 0
+F_HOOK_HUD_ADDENTITY = 0
 
 anyftr <\
 	BHOP,\
@@ -134,3 +135,7 @@ anyftr <\
 anyftr <\
 	SCREEN_INFO,\
 0>, <F_HOOK_HUD_REDRAW = 1>
+
+anyftr <\
+	KNIFEBOT,\
+0>, <F_HOOK_HUD_ADDENTITY = 1>

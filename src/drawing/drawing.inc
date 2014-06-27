@@ -11,3 +11,9 @@ else
 	display 'Error, invalid SCREEN_INFO_FLOAT_DIGITS value: ', d=SCREEN_INFO_FLOAT_DIGITS, 13, 10
 	err
 end if
+
+align 4
+flPOne dd 1.0
+flMOne dd -1.0
+flScreenCenter vec2_s
+screenCoord vec2_s

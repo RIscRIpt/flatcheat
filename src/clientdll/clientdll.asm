@@ -312,3 +312,27 @@ proc CL_CreateMove c frametime, cmd, active
 	mov eax, [oCL_CreateMove_result]
 	ret
 endp
+
+;ent equ esi (and ebx) ;according to debugged info:
+;03843B9C  |.  53            |PUSH EBX                   ; /Arg2 = 289A84A8
+;03843B9D  |.  6A 00         |PUSH 0                     ; |Arg1 = 0
+;03843B9F  |.  E8 6C7EFFFF   |CALL hw.0383BA10           ; \hw.0383BA10
+;--------
+;hw.0383BA10:
+;0383BA26  |.  8B75 0C       MOV ESI,DWORD PTR SS:[ARG.2]; Arg2 = ent
+;--------
+;0383BA3B  |.  50            PUSH EAX
+;0383BA3C  |.  56            PUSH ESI ;<- ent
+;0383BA3D  |.  57            PUSH EDI
+;0383BA3E  |.  FFD1          CALL ECX ;<- HUD_AddEntity
+proc HUD_AddEntity c type, ent, modelname
+	cinvoke ClientDLL.HUD_AddEntity, [type], [ent], [modelname]
+	mov [oHUD_AddEntity_result], eax
+	
+	virtual at esi
+		.ent cl_entity_s
+	end virtual
+	
+	mov eax, [oHUD_AddEntity_result]
+	ret
+endp
