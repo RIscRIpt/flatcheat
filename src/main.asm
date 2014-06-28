@@ -279,7 +279,9 @@ proc PatchWorldToScreen
 	
 	mov eax, [pViewMatrix]
 	mov [WorldToScreen.patch_addr], eax
-	mov [CalcScreen.patch_addr], eax
+	if defined CalcScreen
+		mov [CalcScreen.patch_addr], eax
+	end if
 	
 	;Redirect all WorldToScreen calls to our SSE4 version
 	mov ecx, [hw.size]
