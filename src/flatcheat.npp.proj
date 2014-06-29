@@ -69,5 +69,6 @@
         <File name="main.inc" />
         <File name="main.asm" />
         <File name="flatcheat.asm" />
+        <File name="../fc_autorun.cfg" />
     </Project>
 </NotepadPlus>

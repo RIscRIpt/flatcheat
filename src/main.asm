@@ -23,6 +23,8 @@ proc flatcheat_inject
 	
 	stdcall GetScreenInfo
 	stdcall InitScreenDataLocation
+	
+	stdcall Exec, szAutorunFilename
 	ret
 endp
 

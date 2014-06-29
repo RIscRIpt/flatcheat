@@ -178,3 +178,268 @@ proc GetRootDir
 	mov word[edi + 2], 0
 	ret
 endp
+
+proc Exec filename
+	EXEC_BUFFER_SIZE = 4096 ;buffer for commands
+	EXEC_BUFFER_SIZE_EX = 4096 ;buffer for prefix extension
+	locals
+		.hfile dd ?
+		.bread dd ?
+		.nline dd ?
+		.buffer dd ?
+		.in_quote dd ?
+		.search_nl dd ?
+	endl
+
+	invoke MultiByteToWideChar, CP_UTF8, 0, [filename], -1, unicodeBuffer, MAX_PATH
+	cinvoke swprintf, wcsScriptPath, wcsFmtPath, rootDir, unicodeBuffer
+	invoke CreateFileW, wcsScriptPath, GENERIC_READ, FILE_SHARE_READ, 0, OPEN_EXISTING, 0, 0
+	inc eax
+	test eax, eax
+	jz .fail_open
+	
+	mov [.hfile], eax
+	
+	invoke HeapAlloc, [processHeap], 0, EXEC_BUFFER_SIZE + EXEC_BUFFER_SIZE_EX
+	test eax, eax
+	jz .fail_halloc
+	
+	mov [.buffer], eax
+	
+	xor edx, edx
+	mov ebx, [.buffer]
+	mov [.in_quote], edx
+	mov [.search_nl], edx
+	inc edx
+	mov [.nline], edx
+	mov edi, ebx
+
+	;edi - read pointer
+	;ebx - command pointer
+	
+	.read_loop:
+		mov esi, edi
+	.read_more:
+		lea eax, [.bread]
+		mov ecx, [.buffer]
+		add ecx, EXEC_BUFFER_SIZE - 1
+		sub ecx, edi
+		invoke ReadFile, [.hfile], edi, ecx, eax, 0
+		test eax, eax
+		jz .fail_read
+					
+		mov eax, [.bread]
+		mov byte[edi + eax], 0
+		
+		mov edi, esi
+		
+		cmp byte[.search_nl], 0
+		jne .search_newline
+		
+		mov ecx, [.in_quote]
+		
+		.process_buffer:
+			mov eax, [edi]
+			cmp al, '"'
+			je .process_quote
+			cmp al, 10
+			je .process_line_nl
+			cmp al, ';'
+			je .process_line
+			test ecx, ecx
+			jne .skip_comment_check
+				cmp ax, '//'
+				je .process_comment
+			.skip_comment_check:
+			cmp eax, 'pfx#'
+			je .process_prefix
+			test al, al
+			jz .process_eob
+			inc edi
+			jmp .process_buffer
+
+		.process_quote:
+			not ecx
+			not [.in_quote]
+			inc edi
+			jmp .process_buffer
+
+		.process_eob:
+			cmp [.bread], 0
+			je .process_last_line
+
+			mov ecx, edi
+			sub ecx, ebx
+			cmp ecx, EXEC_BUFFER_SIZE
+			je .process_too_long_line
+			mov esi, ebx
+			mov edi, [.buffer]
+			mov ebx, edi
+			rep movsb
+			
+			;check if possible pfx# is at the end
+			mov ecx, 3
+			mov eax, [edi - 3]
+			and eax, 0xFFFFFF
+			cmp eax, 'pfx'
+			je .possible_pfx
+			dec ecx
+			shr eax, 8
+			cmp ax, 'pf'
+			je .possible_pfx
+			dec ecx
+			shr eax, 8
+			cmp al, 'p'
+			je .possible_pfx
+			dec ecx
+			.possible_pfx:
+			mov esi, edi
+			sub esi, ecx
+			jmp .read_more
+
+		.process_line_nl:
+			cmp byte[edi - 1], 13
+			jne .process_line
+				mov byte[edi - 1], 0
+		.process_line:
+			mov byte[edi], 0
+			inc [.nline]
+			cinvoke Engine.pfnClientCmd, ebx
+			inc edi
+			mov ebx, edi
+			xor ecx, ecx
+			mov [.in_quote], ecx
+			jmp .process_buffer
+		
+		.process_comment:
+			mov byte[edi], 0
+			cinvoke Engine.pfnClientCmd, ebx
+			
+		.search_newline:
+			mov al, 10 ;new line
+			repne scasb
+			je .nl_found
+				;new line not found
+				inc [.search_nl]
+				mov ebx, [.buffer]
+				mov edi, ebx
+				jmp .read_loop
+			.nl_found:
+				inc [.nline]
+				;new line found
+				xor edx, edx
+				mov [.search_nl], edx
+				mov ebx, edi
+				xor ecx, ecx
+				mov [.in_quote], ecx
+				jmp .process_buffer
+		
+		.process_prefix:
+			if sizeof.PREFIX = 4
+				mov dword[edi], PREFIX
+				add edi, 4
+			else if sizeof.PREFIX < 4
+				std ;shift >> parsed contents (4 - sizeof.PREFIX) times
+				mov dword[edi], PREFIX shl (8 * (4 - sizeof.PREFIX))
+				lea edx, [edi + 4]
+				lea esi, [edi - 1]
+				mov ecx, edi
+				if ~ sizeof.PREFIX = 3
+					add edi, 4 - sizeof.PREFIX - 1
+				end if
+				sub ecx, ebx
+				rep movsb
+				mov edi, edx
+				add ebx, 4 - sizeof.PREFIX
+				cld
+			else ;sizeof.PREFIX > 4
+				;check if enough buffer before `edi`
+				mov eax, [.buffer]
+				sub eax, ebx
+				neg eax
+				cmp eax, sizeof.PREFIX
+				jl .not_enough
+					;enough, allocate space for prefix before `edi`
+					lea edx, [edi - (sizeof.PREFIX - 4)]
+					mov ecx, edx
+					lea edi, [ebx - (sizeof.PREFIX - 4)]
+					mov esi, ebx
+					sub ecx, esi
+					inc ecx
+					rep movsb
+					sub ebx, sizeof.PREFIX - 4
+					jmp .prefix_space_allocated
+				.not_enough:
+					;check if buffer is full
+					mov ecx, [.bread]
+					cmp ecx, EXEC_BUFFER_SIZE + EXEC_BUFFER_SIZE_EX - sizeof.PREFIX - 1
+					jg .process_full_buffer ;not likely to happen
+						std ;if buffer is not full, extend it
+						mov edx, edi
+						mov eax, [.buffer]
+						lea esi, [eax + ecx - 1]
+						lea edi, [esi + (sizeof.PREFIX - 4)]
+						mov ecx, edi
+						sub ecx, edx	; +4 (copying by 4 bytes more than needed),
+										;so we could use edx in .prefix_space_allocated
+						mov byte[edi + 1], 0 ;add null terminator
+						rep movsb
+						cld
+						add [.bread], sizeof.PREFIX - 4
+						jmp .prefix_space_allocated
+					; .full:
+						; std ;truncate end of buffer, shift buffer right
+						; mov edx, edi
+						; mov eax, [.buffer]
+						; lea edi, [eax + ecx - 1]
+						; lea esi, [edi - (sizeof.PREFIX - 4)]
+						; mov ecx, esi
+						; sub ecx, edx	; +4 (copying by 4 bytes more than needed),
+										; ;so we could use edx in .prefix_space_allocated
+						; rep movsb
+						; cld
+					.prefix_space_allocated:
+						mov edi, edx
+						mov esi, cvarNameDump ;first bytes must be prefix there
+						mov ecx, sizeof.PREFIX
+						rep movsb
+			end if
+			
+			mov ecx, [.in_quote]
+			jmp .process_buffer
+		
+		.process_too_long_line:
+			cinvoke Engine.Con_Printf, szErr_ExecTooLongLine, [filename], [.nline]
+			inc [.search_nl]
+			mov ebx, [.buffer]
+			mov edi, ebx
+			jmp .read_loop
+		
+		.process_full_buffer:
+			cinvoke Engine.Con_Printf, szErr_ExecExBufOverflow, [filename], [.nline]
+			jmp .done
+			
+	.process_last_line:
+		cinvoke Engine.pfnClientCmd, ebx
+	.done:
+		invoke HeapFree, [processHeap], 0, [.buffer]
+		invoke CloseHandle, [.hfile]
+		ret
+	
+	.fail_open:
+		mov esi, szErr_ExecFailOpen
+		jmp .fail
+	.fail_halloc:
+		invoke CloseHandle, [.hfile]
+		mov esi, szErr_ExecFailHAlloc
+		jmp .fail
+	.fail_read:
+		invoke HeapFree, [processHeap], 0, [.buffer]
+		invoke CloseHandle, [.hfile]
+		mov esi, szErr_ExecFailRead
+		;jmp .fail
+	.fail:
+		invoke GetLastError
+		cinvoke Engine.Con_Printf, esi, [filename], eax
+		ret
+endp

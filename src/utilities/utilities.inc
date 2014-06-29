@@ -1,1 +1,7 @@
 string szErr_VirtualProtect_s, 'VirtualProtect failed.'
+
+string szErr_ExecTooLongLine,	'Error: ', 'Exec failed to process long line "%s":%d (it will be ignored)', 13, 10
+string szErr_ExecExBufOverflow,	'Error: ', 'Exec failed to replace pfx# ("%s"), extension buffer overflow', 13, 10
+string szErr_ExecFailOpen,		'Error: ', 'Exec failed to open file "%s" [Error: #%08x]', 13, 10
+string szErr_ExecFailHAlloc,	'Error: ', 'Exec failed to allocate memory for reading buffer [Error: #%08x]', 13, 10
+string szErr_ExecFailRead,		'Error: ', 'Exec failed to read file "%s" [Error: #%08x]', 13, 10

@@ -88,6 +88,8 @@ string cvar_ex_interp,		PREFIX, 'ex_interp'
 
 string szWelcomeMessage, 'flatcheat has been successfully loaded.', 10
 
+string szAutorunFilename,	AUTORUN_FILE
+
 string szErr_FailedToFindCvar_x,				'Failed to find cvar `%s`'
 string szErr_RedirectClientSpeedMultiplierPtr,	'RedirectClientSpeedMultiplierPtr failed.', 13, 10, 'There was not exactly 30 redirections!'
 string szErr_FailToFindLimConnCvarsFuncRef,		'Failed to find LimitConnectionCvars function call reference'
