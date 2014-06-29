@@ -942,7 +942,7 @@ struct Engine_s
 ends
 
 struct StudioInterface_s
-	pVersion			dd ?
+	version				dd ?
 	StudioDrawModel		dd ?
 	StudioDrawPlayer	dd ?
 ends

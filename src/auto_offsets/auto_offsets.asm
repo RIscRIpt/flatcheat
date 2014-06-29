@@ -192,6 +192,7 @@ proc AO_GetStudioModelInterface
 		szAO_GetStudioModelInterface, szByte, [eax], eax, ASM_INSTR_PUSH_DWORD
 	.found:
 	mov eax, [eax - 0x0F]
+	mov eax, [eax]
 	mov [pStudioInterface], eax
 	ret
 endp
