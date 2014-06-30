@@ -230,7 +230,10 @@ proc CL_CreateMove c frametime, cmd, active
 			je .end_GROUND_STRAFE
 				test [.pmove.flags], FL_ONGROUND
 				jz .gs_not_on_ground
+					cmp [groundstrafe_nsd.value], 0.0
+					je .gs_skip_nsd
 					mov_dbl_const clientSpeed, 1.0
+					.gs_skip_nsd:
 					test [.pmove.flags], FL_DUCKING
 					jnz .gs_ducking
 						cmp [.pmove.bInDuck], 0
