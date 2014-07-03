@@ -76,7 +76,7 @@ section '.code' code readable writeable executable
 	
 	include 'utilities/utilities.asm'
 
-	proc DllMain hinstDLL, fdwReason, lpvReserved
+	proc DllMain uses ebx esi edi, hinstDLL, fdwReason, lpvReserved
 		cmp [fdwReason], DLL_PROCESS_ATTACH ;won't be called with another reason due to HideDLL
 		jne .done
 		
