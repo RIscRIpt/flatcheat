@@ -16,12 +16,4 @@ userButtons dd ?
 currentFrameN dd 0
 showFrameN dd 0
 
-unicodeBuffer dw 256 dup 0
-sizeof.unicodeBuffer = $ - unicodeBuffer
-
-
-
-wcsFmtPath du '%s\%s', 0
-wcsScriptPath dw MAX_PATH + 1 dup ?
-
 string szCmdExecUsage,			'Usage: ', PREFIX, 'exec "path to a script.cfg"', 13, 10

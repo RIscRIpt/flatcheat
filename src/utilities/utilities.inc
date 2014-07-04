@@ -19,3 +19,9 @@ divTable: ;used in itoa
 	dd 10
 	dd 1
 divTableEnd:
+
+unicodeBuffer dw 256 dup 0
+sizeof.unicodeBuffer = $ - unicodeBuffer
+
+wcsFmtPath du '%s\%s', 0
+wcsScriptPath dw MAX_PATH + 1 dup ?
