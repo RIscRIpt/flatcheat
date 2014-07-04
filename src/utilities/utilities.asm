@@ -15,6 +15,70 @@ macro memcpy dest, src, len {
 	stdcall asm_memcpy
 }
 
+proc asm_atoi
+	xor eax, eax
+	xor edx, edx
+	.loop:
+	mov dl, byte[ecx]
+	test dl, dl
+	jz .ret
+	sub dl, '0'
+	cmp dl, 9
+	ja .invalid
+	imul eax, eax, 10
+	jo .invalid
+	add eax, edx
+	inc ecx
+	jmp .loop
+	.invalid:
+	xor eax, eax
+	.ret:
+	ret
+endp
+
+macro atoi s {
+	mov ecx, s
+	stdcall asm_atoi
+}
+
+proc asm_itoa
+	test ebx, ebx
+	jz .zero
+	mov ecx, divTable
+	.skip_loop:
+	xor edx, edx
+	mov eax, ebx
+	div dword[ecx]
+	add ecx, 4
+	test eax, eax
+	jz .skip_loop
+	jmp .begin_loop
+	.loop:
+	mov eax, edx
+	xor edx, edx
+	div dword[ecx]
+	add ecx, 4
+	.begin_loop:
+	add al, '0'
+	mov byte[edi], al
+	inc edi
+	cmp ecx, divTableEnd
+	jne .loop
+	mov byte[edi], 0
+	ret
+	.zero:
+	mov dword[edi], '0'
+	ret
+endp
+
+macro itoa val, dest {
+	if ~ val eq ebx
+		mov ebx, val
+	end if
+	mov edi, dest
+	stdcall asm_itoa
+}
+
 proc FindRefCallAddr start, size, address
 	mov edi, [start]
 	mov edx, [address]
