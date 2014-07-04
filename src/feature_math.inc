@@ -24,6 +24,19 @@ macro anyftr features, cmd {
 	end if
 }
 
+macro noftr features, cmd {
+	local .ok
+	.ok = 0
+	irp feature, features \{
+		if defined feature & feature
+			.ok = 0
+		end if
+	\}
+	if .ok = 1
+		cmd
+	end if
+}
+
 macro display_space_align str, count {
 	display str
 	virtual at 0
@@ -41,7 +54,7 @@ macro display_space_align str, count {
 macro display_feature name, size {
 	local .spaces, .tmp
 	display_space_align szCUR_PROC_NAME, 22
-	if ~ size eq
+	if ~ size eq & size
 		display_space_align <': ', `name>, 29
 		display '(', d=(.end_#name - .#name), ' bytes)'
 	else
@@ -99,13 +112,17 @@ macro prologue_define_cur_proc procname, flag, parmbytes, localbytes, reglist {
 	prologuedef procname, flag, parmbytes, localbytes, reglist
 }
 
-macro epilogue_restore_cur_proc procname, flag, parmbytes, localbytes, reglist {
+macro close_restore_cur_proc procname, flag, parmbytes, localbytes, reglist {
+	if defined SHOW_COMPILED_PROC_SIZE & SHOW_COMPILED_PROC_SIZE
+		display_space_align 'Compiled:', 16
+		display_space_align szCUR_PROC_NAME, 51
+		display '(', d=($ - procname), ' bytes)', 13, 10
+	end if
 	restore szCUR_PROC_NAME
-	epiloguedef procname, flag, parmbytes, localbytes, reglist
 }
 
 prologue@proc equ prologue_define_cur_proc
-epilogue@proc equ epilogue_restore_cur_proc
+close@proc equ close_restore_cur_proc
 
 virtual at 0
 	db PREFIX
@@ -125,8 +142,23 @@ F_HOOK_CL_CREATEMOVE = 0
 F_HOOK_HUD_REDRAW = 0
 F_HOOK_HUD_ADDENTITY = 0
 
+SCREEN_INFO_KREEDZ = 0
+
+noftr <\
+	SI_KZ_HSPEED,\
+	SI_KZ_VSPEED,\
+	SI_KZ_HEIGHT,\
+0>, <SCREEN_INFO = 0> ;disable SCREEN_INFO if no SCREEN_INFO feature is enabled
+
+anyftr <\
+	SI_KZ_HSPEED,\
+	SI_KZ_VSPEED,\
+	SI_KZ_HEIGHT,\
+0>, <SCREEN_INFO_KREEDZ = SCREEN_INFO> ;enable SCREEN_INFO_KREEDZ only if SCREEN_INFO is enabled
+
 anyftr <\
 	BHOP,\
+	FASTRUN,\
 	JUMPBUG,\
 	STRAFE,\
 	GROUND_STRAFE,\
@@ -134,6 +166,7 @@ anyftr <\
 
 anyftr <\
 	SCREEN_INFO,\
+	FPS_BOOST_SKIP_HUD_REDRAW,\
 0>, <F_HOOK_HUD_REDRAW = 1>
 
 anyftr <\
