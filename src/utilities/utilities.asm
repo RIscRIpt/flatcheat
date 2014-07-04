@@ -381,6 +381,9 @@ proc Exec filename
 			
 		.search_newline:
 			mov al, 10 ;new line
+			mov ecx, [.buffer]
+			add ecx, [.bread]
+			sub ecx, edi
 			repne scasb
 			je .nl_found
 				;new line not found
