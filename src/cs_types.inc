@@ -324,7 +324,22 @@ IN_RELOAD					= 1 shl 13
 IN_ALT1						= 1 shl 14
 IN_SCORE					= 1 shl 15
 
+;Resource types
+t_sound						= 0
+t_skin						= 1
+t_model						= 2
+t_decal						= 3
+t_generic					= 4
+t_eventscript				= 5
+t_world						= 6 ;Fake type for world, is really t_model
+
 HISTORY_MAX					= 64 ;Must be power of 2
+
+MAX_SCOREBOARDNAME			= 32
+MAX_QPATH					= 64
+MAX_INFO_STRING				= 256
+
+MAXSTUDIOBONES				= 128
 
 struct vec2_s
 	x dd ?
@@ -511,6 +526,13 @@ struct playermove_s
 	player_maxs			db (sizeof.vec3_s * 4) dup ?
 ends ;playermove_s
 
+struct pcolor32_s
+	r db ?
+	g db ?
+	b db ?
+	a db ?
+ends ;pcolor32_s
+
 struct color24_s
 	r dw ?
 	g dw ?
@@ -522,7 +544,7 @@ struct colorVec
 	g dd ?
 	b dd ?
 	a dd ?
-ends
+ends ;colorVec
 
 struct entity_state_s
 	;Fields which are filled in by routines outside of delta compression
@@ -625,7 +647,7 @@ struct mouth_s
 	mouthopen			dw ? ;0 = mouth closed, 255 = mouth agape
 	sndcount			dw ? ;counter for running average
 	sndavg				dd ? ;running average
-ends
+ends ;mouth_s
 
 struct latchedvars_s
 	prevanimtime		dd ?  
@@ -720,6 +742,78 @@ struct cl_entity_s
 	cvFloorColor		colorVec
 ends ;cl_entity_s
 
+struct resource_s
+	szFileName			db MAX_QPATH dup ? ;File name to download/precache.
+	type				dd ? ;t_sound, t_skin, t_model, t_decal.
+	nIndex				dd ? ;For t_decals
+	nDownloadSize		dd ? ;Size in Bytes if this must be downloaded.
+	ucFlags				dw ?
+
+	;For handling client to client resource propagation
+	rgucMD5_hash		db 16 dup ? ;To determine if we already have it.
+	playernum			dw ? ;Which player index this resource is associated with, if it's a custom resource.
+
+	rguc_reserved		db 32 dup ? ;For future expansion
+	pNext				dd ? ;struct resource_s *: Next in chain.
+	pPrev				dd ? ;struct resource_s *
+ends ;resource_s
+
+struct customization_s
+	bInUse				dd ? ;Is this customization in use;
+	_resource			resource_s ;The resource_t for this customization
+	bTranslated			dd ? ;Has the raw data been translated into a useable format?  
+							 ;(e.g., raw decal .wad make into texture_t *)
+	nUserData1			dd ? ;Customization specific data
+	nUserData2			dd ? ;Customization specific data
+	pInfo				dd ? ;void*: Buffer that holds the data structure that references the data (e.g., the cachewad_t)
+	pBuffer				dd ? ;void*: Buffer that holds the data for the customization (the raw .wad data)
+	pNext				dd ? ;struct customization_s*: Next in chain
+ends ;customization_s
+
+struct player_info_s
+	;User id on server
+	userid				dd ?
+
+	;User info string
+	userinfo			db MAX_INFO_STRING dup ?
+
+	name				db MAX_SCOREBOARDNAME dup ?
+
+	;Spectator or not, unused
+	spectator			dd ?
+
+	ping				dd ?
+	packet_loss			dd ?
+
+	;skin information
+	model				db MAX_QPATH dup ?
+	topcolor			dd ?
+	bottomcolor			dd ?
+
+	;last frame rendered
+	renderframe			dd ?
+
+	;Gait frame estimation
+	gaitsequence		dd ?
+	gaitframe			dd ? ;float
+	gaityaw				dd ? ;float
+	prevgaitorigin		vec3_s
+
+	customdata			customization_s
+ends ;player_info_t
+
+struct screenfade_s
+	fadeSpeed			dd ? ;float: How fast to fade (tics / second) (+ fade in, - fade out)
+	fadeEnd				dd ? ;float: When the fading hits maximum
+	fadeTotalEnd		dd ? ;float: Total End Time of the fade (used for FFADE_OUT)
+	fadeReset			dd ? ;float: When to reset to not fading (for fadeout and hold)
+	r					db ? ;Fade color, red
+	g					db ? ;Fade color, green
+	b					db ? ;Fade color, blue
+	a					db ? ;Fade Alpha
+	fadeFlags			dd ? ;Fading flags
+ends
+
 struct SCREENINFO_s
 	iSize		dd sizeof.SCREENINFO_s
 	iWidth		dd ?
@@ -773,7 +867,7 @@ struct ClientDLL_s
 	HUD_ChatInputPosition			dd ?
 	HUD_GetPlayerTeam				dd ?
 	ClientFactory					dd ?
-ends
+ends ;ClientDLL_s
 
 struct NET_API_s
 	InitNetworking					dd ?
@@ -787,7 +881,7 @@ struct NET_API_s
 	ValueForKey						dd ?
 	RemoveKey						dd ?
 	SetValueForKey					dd ?
-ends
+ends ;NET_API_s
 
 struct triangleapi_s
 	version							dd ?
@@ -939,10 +1033,199 @@ struct Engine_s
 	pfnClearArray					dd ?
 	pfnPlaySound2					dd ?
 	pfnTintRGBA						dd ?
-ends
+ends ;Engine_s
 
 struct StudioInterface_s
 	version				dd ?
 	StudioDrawModel		dd ?
 	StudioDrawPlayer	dd ?
-ends
+ends ;StudioInterface_s
+
+struct EngineStudio_s
+	; Check to see if pointer is in the cache
+	Cache_Check						dd ? ;void*: struct cache_user_s *c 
+	; Load file into cache ( can be swapped out on demand )
+	LoadCacheFile					dd ? ;void: char *path, struct cache_user_s *cu
+	; Retrieve model pointer for the named model
+	Mod_ForName						dd ? ;struct model_s*: const char *name, int crash_if_missing 
+	; Retrieve pointer to studio model data block from a model
+	Mod_Extradata					dd ? ;void*: struct model_s *mod 
+	; Retrieve indexed model from client side model precache list
+	GetModelByIndex					dd ? ;struct model_s*: int index
+	; Get entity that is set for rendering
+	GetCurrentEntity				dd ? ;struct cl_entity_s*: void
+	; Get referenced player_info_t
+	PlayerInfo						dd ? ;struct player_info_s*: int index
+	; Get most recently received player state data from network system
+	GetPlayerState					dd ? ;struct entity_state_s*: int index
+	; Get viewentity
+	GetViewEntity					dd ? ;struct cl_entity_s*: void
+	; Get current frame count, and last two timestampes on client
+	GetTimes						dd ? ;void: int *framecount, double *current, double *old
+	; Get a pointer to a cvar by name
+	GetCvar							dd ? ;struct cvar_s*: const char *name
+	; Get current render origin and view vectors ( up, right and vpn )
+	GetViewInfo						dd ? ;void: float *origin, float *upv, float *rightv, float *vpnv
+	; Get sprite model used for applying chrome effect
+	GetChromeSprite					dd ? ;struct model_s*: void
+	; Get model counters so we can incement instrumentation
+	GetModelCounters				dd ? ;void: int **s, int **a
+	; Get software scaling coefficients
+	GetAliasScale					dd ? ;void: float *x, float *y
+
+	; Get bone, light, alias, and rotation matrices
+	StudioGetBoneTransform			dd ? ;float ****:void
+	StudioGetLightTransform			dd ? ;float ****:void
+	StudioGetAliasTransform			dd ? ;float ***:void
+	StudioGetRotationMatrix			dd ? ;float ***:void
+
+	; Set up body part, and get submodel pointers
+	StudioSetupModel				dd ? ;void: int bodypart, void **ppbodypart, void **ppsubmodel
+	; Check if entity's bbox is in the view frustum
+	StudioCheckBBox					dd ? ;int: void
+	; Apply lighting effects to model
+	StudioDynamicLight				dd ? ;void: struct cl_entity_s *ent, struct alight_s *plight
+	StudioEntityLight				dd ? ;void: struct alight_s *plight
+	StudioSetupLighting				dd ? ;void: struct alight_s *plighting
+
+	; Draw mesh vertices
+	StudioDrawPoints				dd ? ;void: void
+
+	; Draw hulls around bones
+	StudioDrawHulls					dd ? ;void: void
+	; Draw bbox around studio models
+	StudioDrawAbsBBox				dd ? ;void: void
+	; Draws bones
+	StudioDrawBones					dd ? ;void: void
+	; Loads in appropriate texture for model
+	StudioSetupSkin					dd ? ;void: void* ptexturehdr, int index
+	; Sets up for remapped colors
+	StudioSetRemapColors			dd ? ;void: int top, int bottom
+	; Set's player model and returns model pointer
+	SetupPlayerModel				dd ? ;struct model_s*: int index
+	; Fires any events embedded in animation
+	StudioClientEvents				dd ? ;void: void
+	; Retrieve/set forced render effects flags
+	GetForceFaceFlags				dd ? ;int: void
+	SetForceFaceFlags				dd ? ;void: int flags
+	; Tell engine the value of the studio model header
+	StudioSetHeader					dd ? ;void: void* header
+	; Tell engine which model_t * is being renderered
+	SetRenderModel					dd ? ;void: struct model_s *model
+
+	; Final state setup and restore for rendering
+	SetupRenderer					dd ? ;void: int rendermode
+	RestoreRenderer					dd ? ;void: void
+
+	; Set render origin for applying chrome effect
+	SetChromeOrigin					dd ? ;void: void
+
+	; True if using D3D/OpenGL
+	IsHardware						dd ? ;int: void
+
+	; Only called by hardware interface
+	GL_StudioDrawShadow				dd ? ;void: void 
+	GL_SetRenderMode				dd ? ;void: int mode 
+	StudioSetRenderamt				dd ? ;void: int iRenderamt ;!!!CZERO added for rendering glass on viewmodels
+	StudioSetCullState				dd ? ;void: int iCull   
+	StudioRenderShadow				dd ? ;void: int iSprite, float *p1, float *p2, float *p3, float *p4
+ends ;EngineStudio_s
+
+struct StudioModelRender_s
+	CStudioModelRenderer				dd ? ;void: void
+	Init								dd ? ;void: void
+	StudioDrawModel						dd ? ;int: int flags
+	StudioDrawPlayer					dd ? ;int: int flags, struct entity_state_s *pplayer
+	StudioGetAnim						dd ? ;mstudioanim_t: model_t *m_pSubModel, mstudioseqdesc_t *pseqdesc
+	StudioSetUpTransform				dd ? ;void: int trivial_accept
+	StudioSetupBones					dd ? ;void: void
+	StudioCalcAttachments				dd ? ;void: void
+	StudioSaveBones						dd ? ;void: void
+	StudioMergeBones					dd ? ;void: model_t *m_pSubModel
+	StudioEstimateInterpolant			dd ? ;float: void
+	StudioEstimateFrame					dd ? ;float: mstudioseqdesc_t *pseqdesc
+	StudioFxTransform					dd ? ;void: cl_entity_t *ent, float transform[3][4]
+	StudioSlerpBones					dd ? ;void: vec4_t q1[], float pos1[][3], vec4_t q2[], float pos2[][3], float s
+	StudioCalcBoneAdj					dd ? ;void: float dadt, float *adj, const byte *pcontroller1, const byte *pcontroller2, byte mouthopen
+	StudioCalcBoneQuaterion				dd ? ;void: int frame, float s, mstudiobone_t *pbone, mstudioanim_t *panim, float *adj, float *q
+	StudioCalcBonePosition				dd ? ;void: int frame, float s, mstudiobone_t *pbone, mstudioanim_t *panim, float *adj, float *pos
+	StudioCalcRotations					dd ? ;void: float pos[][3], vec4_t *q, mstudioseqdesc_t *pseqdesc, mstudioanim_t *panim, float f
+	StudioRenderModel					dd ? ;void: void
+	StudioRenderFinal					dd ? ;void: void
+	StudioRenderFinal_Software			dd ? ;void: void
+	StudioRenderFinal_Hardware			dd ? ;void: void
+	StudioPlayerBlend					dd ? ;void: mstudioseqdesc_t *pseqdesc, int *pBlend, float *pPitch
+	StudioEstimateGait					dd ? ;void: entity_state_t *pplayer
+	StudioProcessGait					dd ? ;void: entity_state_t *pplayer
+ends ;StudioModelRender_s
+
+struct StudioModelRender_vars_s
+	m_Unknown							db 8 dup ? ;Please tell me wtf is this
+	m_clTime							dq ? ;Client clock
+	m_clOldTime							dq ? ;Old Client clock
+
+	m_fDoInterp							dd ? ;Do interpolation?
+	m_fGaitEstimation					dd ? ;Do gait estimation?
+
+	m_nFrameCount						dd ? ;Current render frame #
+
+	;Cvars that studio model code needs to reference
+	m_pCvarHiModels						dd ? ;ptr to cvar_t, Use high quality models?
+	m_pCvarDeveloper					dd ? ;ptr to cvar_t, Developer debug output desired?
+	m_pCvarDrawEntities					dd ? ;ptr to cvar_t, Draw entities bone hit boxes, etc?
+
+	m_pCurrentEntity					dd ? ;ptr to cl_entity_s, The entity which we are currently rendering.
+
+	m_pRenderModel						dd ? ;ptr to model_s, The model for the entity being rendered
+
+	m_pPlayerInfo						dd ? ;ptr to player_info_s, Player info for current player, if drawing a player
+
+	m_nPlayerIndex						dd ? ;The index of the player being drawn
+
+	m_flGaitMovement					dd ? ;The player's gait movement
+
+	m_pStudioHeader						dd ? ;ptr to studiohdr_t, Pointer to header block for studio model data
+
+	;Pointers to current body part and submodel
+	m_pBodyPart							dd ? ;ptr to mstudiobodyparts_t
+	m_pSubModel							dd ? ;ptr to mstudiomodel_t
+
+	;Palette substition for top and bottom of model
+	m_nTopColor							dd ?			
+	m_nBottomColor						dd ?
+
+	m_pChromeSprite						dd ? ;ptr to model_s, Sprite model used for drawing studio model chrome
+
+	;Caching
+	m_nCachedBones						dd ? ;Number of bones in bone cache
+	m_nCachedBoneNames					db MAXSTUDIOBONES * 32 dup ? ;Names of cached bones
+	
+	;Cached bone & light transformation matrices
+	m_rgCachedBoneTransform				dd MAXSTUDIOBONES * 3 * 4 dup ? ;float
+	m_rgCachedLightTransform			dd MAXSTUDIOBONES * 3 * 4 dup ? ;float
+
+	;Software renderer scale factors
+	m_fSoftwareXScale					dd ? ;float
+	m_fSoftwareYScale					dd ? ;float
+
+	;Current view vectors and render origin
+	m_vUp								vec3_s
+	m_vRight							vec3_s
+	m_vNormal							vec3_s
+
+	m_vRenderOrigin						vec3_s
+
+	;Model render counters ( from engine )
+	m_pStudioModelCount					dd ? ;ptr to int
+	m_pModelsDrawn						dd ? ;ptr to int
+
+	;Matrices
+	;Model to world transformation
+	m_protationmatrix					dd ? ;ptr to float m_protationmatrix[3][4]
+	;Model to view transformation
+	m_paliastransform					dd ? ;ptr to float m_paliastransform[3][4]
+
+	;Concatenated bone and light transforms
+	m_pbonetransform					dd ? ;ptr to float m_pbonetransform[MAXSTUDIOBONES][3][4]
+	m_plighttransform					dd ? ;ptr to float m_plighttransform[MAXSTUDIOBONES][3][4]
+ends ;StudioModelRender_This_s
