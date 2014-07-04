@@ -155,6 +155,32 @@ proc AO_GetClientSpeedMultiplier
 	ret
 endp
 
+proc AO_GetClientTimePtr
+	mov eax, [Engine.GetClientTime]
+	add eax, 0x0A
+	cmp word[eax], ASM_INSTR_FLD_QWORD_PTR
+	je .found
+	jmpcall ShowFatalError, szErr_s_Failed_Invalid_x_at_x_x,\
+		szAO_GetClientTimePtr, szWord, [eax], eax, ASM_INSTR_FLD_QWORD_PTR
+	.found:
+	mov eax, [eax + 2]
+	mov [pClientTime], eax
+	ret
+endp
+
+proc AO_GetScreenFade
+	mov eax, [Engine.pfnSetScreenFade]
+	add eax, 0x17
+	cmp byte[eax], ASM_INSTR_MOV_EDI_DWORD
+	je .found
+	jmpcall ShowFatalError, szErr_s_Failed_Invalid_x_at_x_x,\
+		szAO_GetScreenFade, szByte, [eax], eax, ASM_INSTR_MOV_EDI_DWORD
+	.found:
+	mov eax, [eax + 1]
+	mov [pScreenFade], eax
+	ret
+endp
+
 proc AO_GetPushHGSMIReference
 	stdcall FindBytePattern, [hw.base], [hw.size], szErrMsgCouldntGetStudioModelRI, sizeof.szErrMsgCouldntGetStudioModelRI - 1
 	test eax, eax
@@ -226,6 +252,26 @@ proc AO_GetConsoleColor
 	mov [pConsoleColor], eax
 	add eax, 4
 	mov [pConsoleDevColor], eax
+	ret
+endp
+
+proc AO_GetScreenPrintColor
+	mov eax, [Engine.pfnDrawSetTextColor]
+	add eax, 0x42
+	cmp byte[eax], ASM_INSTR_CALL
+	je .found1
+	jmpcall ShowFatalError, szErr_s_Failed_Invalid_x_at_x_x,\
+		szAO_GetScreenPrintColor, szByte, [eax], eax, ASM_INSTR_CALL
+	.found1:
+	add eax, [eax + 1]
+	add eax, 5 + 0x1C
+	cmp byte[eax], ASM_INSTR_MOV_DWORD_PTR_EAX
+	je .found2
+	jmpcall ShowFatalError, szErr_s_Failed_Invalid_x_at_x_x,\
+		szAO_GetScreenPrintColor, szByte, [eax], eax, ASM_INSTR_MOV_DWORD_PTR_EAX
+	.found2:
+	mov eax, [eax + 1]
+	mov [pScreenPrintColor], eax
 	ret
 endp
 

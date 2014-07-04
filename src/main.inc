@@ -21,6 +21,7 @@ ClientDLL_Interface_Version dd 0
 
 pConsoleColor				dd ? ;ptr to Console text color
 pConsoleDevColor			dd ? ;ptr to Console text color, when developer = 1
+pScreenPrintColor			dd ? ;ptr to Screen text color (that is used by pfnDrawConsoleString)
 pushScreenFade				dd ? ;ptr to push OFFSET "ScreenFade"
 pClientDLL					dd ? ;ptr to ClientDLL_s
 pEngine						dd ? ;ptr to Engine_s
@@ -36,6 +37,8 @@ pViewMatrix					dd ? ;(not sure if it's really viewmatrix) used in WorldToScreen
 pWorldToScreen				dd ? ;ptr to original function WorldToScreen (in hw.dll)
 
 pClientSpeed				dd ? ;ptr to Client speed multiplier
+pClientTime					dd ? ;ptr to Client time
+pScreenFade					dd ? ;ptr to Client screenfade_s struct
 
 pRegVarMallocCall			dd ? ;ptr to pfnRegisterVariable malloc call address
 
@@ -71,10 +74,6 @@ restoreList_Engine:
 	VTRestore_s pEngine, Engine, Engine_s.pfnRegisterVariable
 	dd 0
 
-hookList_StudioInterface:
-	;VTHook_s pStudioInterface, StudioInterface
-	dd 0
-
 cvarHookList:
 	CvarHook_s cvar_fps_max + sizeof.PREFIX,			cvar_fps_max,			0
 	CvarHook_s cvar_fps_override + sizeof.PREFIX,		cvar_fps_override,		pCvarFpsOverride
@@ -91,8 +90,13 @@ string szWelcomeMessage, 'flatcheat has been successfully loaded.', 10
 string szAutorunFilename,	AUTORUN_FILE
 
 string szErr_FailedToFindCvar_x,				'Failed to find cvar `%s`'
-string szErr_RedirectClientSpeedMultiplierPtr,	'RedirectClientSpeedMultiplierPtr failed.', 13, 10, 'There was not exactly 30 redirections!'
 string szErr_FailToFindLimConnCvarsFuncRef,		'Failed to find LimitConnectionCvars function call reference'
+
+string szErr_Redirect,							'%s redirection failed.', 13, 10, 'There was not exactly %d redirections (%d were made)'
+
+string szClientSpeedMultiplier,					'Client speed multiplier'
+string szClientTime,							'Client time'
+string szScreenColorX,							'Screen Color (X)'
 
 refreshFuncPatchOrigFunc db 26, 14, 5, 14, 5, 5, 0
 refreshFuncPatch db 	$83, $3D, $FF, $FF, $FF, $FF, $00, $75, $41, $55, $89, $E5, $83, $EC, $14, $C7, \

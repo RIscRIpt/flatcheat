@@ -103,3 +103,22 @@ proc Command_exec
 		call Exec
 		ret
 endp
+
+proc Command_max_flash
+	cinvoke Engine.Cmd_Argc
+	cmp eax, 2
+	jl .display
+		cinvoke Engine.Cmd_Argv, 1
+		atoi eax
+		test eax, 0xFFFFFF00
+		jnz .limit
+		mov [maxFlashAlpha], al
+		ret
+	.display:
+		movzx ecx, [maxFlashAlpha]
+		cinvoke Engine.Con_Printf, szFmtCV_int, [max_flash.name], ecx
+		ret
+	.limit:
+		cinvoke Engine.Con_Printf, szFmtLim_int, [max_flash.name], 0, 255
+		ret
+endp

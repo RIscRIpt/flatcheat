@@ -32,12 +32,15 @@ dd AO_GetPlayerMove_Ptr
 dd AO_GetClientDLL_Interface_Version
 
 dd AO_GetClientSpeedMultiplier
+dd AO_GetClientTimePtr
+dd AO_GetScreenFade
 
 dd AO_GetPushHGSMIReference
 dd AO_GetEngineStudio
 dd AO_GetStudioModelInterface
 
 dd AO_GetConsoleColor
+dd AO_GetScreenPrintColor
 
 dd AO_GetRegisterVariableMallocCall
 
@@ -79,10 +82,13 @@ string szAO_GetClientDLL,					'AO_GetClientDLL'
 string szAO_GetPlayerMove_Ptr,				'AO_GetPlayerMove_Ptr'
 string szAO_GetClientDLL_Interface_Version,	'AO_GetClientDLL_Interface_Version'
 string szAO_GetClientSpeedMultiplier,		'AO_GetClientSpeedMultiplier'
+string szAO_GetClientTimePtr,				'AO_GetClientTimePtr'
+string szAO_GetScreenFade,					'AO_GetScreenFade'
 string szAO_GetPushHGSMIReference,			'AO_GetPushHGSMIReference'
 string szAO_GetEngineStudio,				'AO_GetEngineStudio'
 string szAO_GetStudioModelInterface,		'AO_GetStudioModelInterface'
 string szAO_GetConsoleColor,				'AO_GetConsoleColor'
+string szAO_GetScreenPrintColor,			'AO_GetScreenPrintColor'
 string szAO_GetRegisterVariableMallocCall,	'AO_GetRegisterVariableMallocCall'
 string szAO_GetRegisterCommandWithFlag,		'AO_GetRegisterCommandWithFlag'
 string szAO_GetRegCmdWithFlagMallocCall,	'AO_GetRegCmdWithFlagMallocCall'

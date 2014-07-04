@@ -2,8 +2,6 @@ proc flatcheat_inject
 	stdcall AO_InitWait
 	stdcall AO_GetAll
 	
-	cinvoke Engine.pfnConsolePrint, szWelcomeMessage
-
 	stdcall Hook_List, hookList_ClientDLL
 	;stdcall Hook_List, hookList_Engine
 	;cinvoke ClientDLL.Initialize, [pEngine], [ClientDLL_Interface_Version]
@@ -15,14 +13,18 @@ proc flatcheat_inject
 	stdcall RegisterCommands
 	stdcall RegisterCvars
 	
-	stdcall RedirectClientSpeedMultiplierPtr
+	stdcall RedirectHWAddress, 30, [pClientSpeed], clientSpeed, szClientSpeedMultiplier
+	stdcall RedirectScreenColorRGBA
+	
 	stdcall PatchRefreshFunc
 	stdcall PatchWorldToScreen
 	chkftr PATCH_CONNECTION_CVARS, <stdcall PatchConnectionCvars>
 	chkftr PATCH_SETINFO, <stdcall PatchSetinfo>
 	
 	stdcall GetScreenInfo
-	stdcall InitScreenDataLocation
+	chkftr SCREEN_INFO, <stdcall InitScreenDataLocation>
+	
+	cinvoke Engine.pfnConsolePrint, szWelcomeMessage
 	
 	stdcall Exec, szAutorunFilename
 	ret
@@ -94,37 +96,63 @@ proc Hook_Cvars
 	ret
 endp
 
-proc RedirectClientSpeedMultiplierPtr
-	;There should be 30 redirections in total
-	;Plus one more check to ensure that no more redirections are needed
-	local counter dd 30 + 1
+proc RedirectScreenColorRGBA
+	local pointer dd ?
+	mov eax, [pScreenPrintColor]
+	mov [pointer], eax
+	mov byte[szScreenColorX + sizeof.szScreenColorX - 3], 'R'
+	stdcall RedirectHWAddress, 6, [pointer], screenColor.r, szScreenColorX ;r
+	inc [pointer]
+	mov byte[szScreenColorX + sizeof.szScreenColorX - 3], 'G'
+	stdcall RedirectHWAddress, 1, [pointer], screenColor.g, szScreenColorX ;g
+	inc [pointer]
+	mov byte[szScreenColorX + sizeof.szScreenColorX - 3], 'B'
+	stdcall RedirectHWAddress, 1, [pointer], screenColor.b, szScreenColorX ;b
+	inc [pointer]
+	mov byte[szScreenColorX + sizeof.szScreenColorX - 3], 'A'
+	stdcall RedirectHWAddress, 1, [pointer], screenColor.a, szScreenColorX ;a
+	ret
+endp
+
+proc RedirectHWAddress counter, address, new_address, redirection_name
+	local count dd ?
 	local result dd ?
 	local oldprot dd ?
 	local searchbase dd ?
 	local searchsize dd ?
+	local pattern dd ?
+	
+	mov ecx, [address]
+	mov [pattern], ecx
+	
+	mov edx, [counter]
+	mov [count], edx
+	inc edx ;Add one more check to ensure that no more redirections are needed
+	mov [counter], edx
 	
 	mov eax, [hw.base]
 	mov ecx, [hw.size]
+	sub ecx, 3
 	mov [searchbase], eax
 	mov [searchsize], ecx
 	
 	.loop:
-	stdcall FindBytePattern, [searchbase], [searchsize], pClientSpeed, 4
+	lea eax, [pattern]
+	stdcall FindBytePattern, [searchbase], [searchsize], eax, 4
 	test eax, eax
-	jz .not_found		
+	jz .not_found
+		sub edx, 3 ;FindBytePattern stores size left after first byte is found of pattern in edx
+		mov [searchsize], edx
 		mov [result], eax
+		add eax, 4
+		mov [searchbase], eax
 		lea ecx, [oldprot]
 		stdcall VirtualProtect_s, eax, 4, PAGE_EXECUTE_READWRITE, ecx
 		mov eax, [result]
-		mov dword[eax], clientSpeed
+		mov edx, [new_address]
 		lea ecx, [oldprot]
+		mov dword[eax], edx
 		stdcall VirtualProtect_s, eax, 4, [oldprot], ecx
-		
-		mov eax, [result]
-		add eax, 4
-		mov [searchbase], eax
-		sub eax, [hw.base]
-		sub [searchsize], eax
 		
 		dec [counter]
 		js .fail ;if counter < 0, jmp .fail
@@ -132,8 +160,10 @@ proc RedirectClientSpeedMultiplierPtr
 	.not_found:
 		dec [counter]
 		jz .ok
-		.fail:
-		jmpcall ShowFatalError, szErr_RedirectClientSpeedMultiplierPtr
+	.fail:
+		mov eax, [count]
+		sub eax, [counter]
+		jmpcall ShowFatalError, szErr_Redirect, [redirection_name], [count], eax
 	.ok:
 	ret
 endp
@@ -166,17 +196,38 @@ proc InitScreenDataLocation
 	pop ebx
 	pop eax
 	
-	mov [SI_KZ_HSpeed_coord.x], eax
-	mov [SI_KZ_HSpeed_coord.y], ebx
-	add ebx, edx
+	feature SI_KZ_HSPEED
+		mov [SI_KZ_HSpeed_coord.x], eax
+		mov [SI_KZ_HSpeed_coord.y], ebx
+		add ebx, edx
+	endf
 	
-	mov [SI_KZ_VSpeed_coord.x], eax
-	mov [SI_KZ_VSpeed_coord.y], ebx
-	add ebx, edx
+	feature SI_KZ_VSPEED
+		mov [SI_KZ_VSpeed_coord.x], eax
+		mov [SI_KZ_VSpeed_coord.y], ebx
+		add ebx, edx
+	endf
 	
-	mov [SI_KZ_Height_coord.x], eax
-	mov [SI_KZ_Height_coord.y], ebx
-	;add ebx, edx
+	feature SI_KZ_HEIGHT
+		mov [SI_KZ_Height_coord.x], eax
+		mov [SI_KZ_Height_coord.y], ebx
+		;add ebx, edx
+	endf
+	
+	feature SI_FLASHED
+		push dword SI_FLASHED_LOCATION_X	
+		push dword SI_FLASHED_LOCATION_Y
+		fld dword[esp]
+		fld dword[esp + 4]
+		fimul [screenInfo.iWidth]
+		fistp dword[esp + 4]
+		fimul [screenInfo.iHeight]
+		fistp dword[esp]
+		pop ebx
+		pop eax
+		mov [SI_MAX_FLASHED_coord.x], eax
+		mov [SI_MAX_FLASHED_coord.y], ebx
+	endf
 	
 	ret
 endp

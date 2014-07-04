@@ -21,9 +21,54 @@ proc HUD_Redraw c time, intermission
 	cinvoke ClientDLL.HUD_Redraw, [time], [intermission]
 	mov [oHUD_Redraw_result], eax
 	
-	inline_feature SI_KZ_HSPEED, <stdcall WriteDoublCenter, [SI_KZ_HSpeed_coord.x], [SI_KZ_HSpeed_coord.y], szKZ_HSpeed, szKZ_HSpeedData, double[me.horizontal_speed]>
-	inline_feature SI_KZ_VSPEED, <stdcall WriteDoublCenter, [SI_KZ_VSpeed_coord.x], [SI_KZ_VSpeed_coord.y], szKZ_VSpeed, szKZ_VSpeedData, double[me.vertical_speed]>
-	inline_feature SI_KZ_HEIGHT, <stdcall WriteDoublCenter, [SI_KZ_Height_coord.x], [SI_KZ_Height_coord.y], szKZ_Height, szKZ_HeightData, double[me.distance_to_ground]>
+	feature SCREEN_INFO
+		inline_feature SI_KZ_HSPEED, <stdcall WriteDoublCenter, [SI_KZ_HSpeed_coord.x], [SI_KZ_HSpeed_coord.y], szKZ_HSpeed, szKZ_HSpeedData, double[me.horizontal_speed]>
+		inline_feature SI_KZ_VSPEED, <stdcall WriteDoublCenter, [SI_KZ_VSpeed_coord.x], [SI_KZ_VSpeed_coord.y], szKZ_VSpeed, szKZ_VSpeedData, double[me.vertical_speed]>
+		inline_feature SI_KZ_HEIGHT, <stdcall WriteDoublCenter, [SI_KZ_Height_coord.x], [SI_KZ_Height_coord.y], szKZ_Height, szKZ_HeightData, double[me.distance_to_ground]>
+	
+		feature SI_FLASHED
+			mov al, [maxFlashAlpha]
+			cmp al, 255
+			je .end_SI_FLASHED
+			
+			mov esi, [pScreenFade]
+			virtual at esi
+				.screenfade screenfade_s
+			end virtual
+			
+			cmp al, [.screenfade.a]
+			ja .mf_flash
+				mov [.screenfade.a], al
+			.mf_flash:
+			
+			mov ecx, [pClientTime]
+			pxor xmm1, xmm1
+			movss xmm0, [.screenfade.fadeEnd]
+			movlpd xmm2, [ecx]
+			cvtsd2ss xmm2, xmm2
+			subss xmm0, xmm2
+			mulss xmm0, [.screenfade.fadeSpeed]
+			comiss xmm0, xmm1
+			jbe .end_SI_FLASHED
+			
+			mulss xmm0, [float255_to_percent]
+			cvtss2si ebx, xmm0
+			
+			cmp ebx, 100
+			jle .si_flashed_le100
+				mov ebx, 100
+			.si_flashed_le100:
+			itoa ebx, szMAX_FLASHEDData
+			mov word[edi], '%' ;edi points to null terminator of szMAX_FLASHEDData after itoa
+			stdcall GetStringWidth, szMAX_FLASHED
+			shr eax, 1
+			mov ecx, [SI_MAX_FLASHED_coord.x]
+			sub ecx, eax
+			
+			mov dword[screenColor], 0xFF0000FF ;Red
+			cinvoke Engine.pfnDrawConsoleString, ecx, [SI_MAX_FLASHED_coord.y], szMAX_FLASHED
+		endf
+	endf
 	
 	mov eax, [oHUD_Redraw_result]
 	ret
