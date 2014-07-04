@@ -29,6 +29,7 @@ section '.data' data readable writeable
 	include 'fc_cmds/cmd_funcs.inc'
 	
 	include 'utilities/utilities.inc'
+	include 'utilities/asm_instr_list.inc'
 
 	rootDir dw MAX_PATH + 1 dup 0
 	
