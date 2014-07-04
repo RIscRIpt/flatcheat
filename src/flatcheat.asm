@@ -101,7 +101,7 @@ section '.code' code readable writeable executable
 		
 		invoke CloseHandle, eax
 		mov eax, 1 ;return 1 even if CloseHandle failed, because thread has been created successfully.
-		jmp .done
+		;jmp .done
 		
 		.done:
 		ret
