@@ -4,11 +4,11 @@ Counter-Strike 1.6 ring3 cheat written in FASM (flat assembler)
 
 ---
 ### How-to-use:
-1. Download the latest stable release ([Download](https://github.com/RIscRIpt/flatcheat/archive/master.zip));
-2. Compile `flatcheat.asm` with FASM on your own ([Download](http://flatassembler.net/download.php));
+1. [Download](https://github.com/RIscRIpt/flatcheat/archive/master.zip) the latest stable release;
+2. Compile `flatcheat.asm` with [FASM](http://flatassembler.net/download.php) on your own ;
   3. Or run `download_fasm.vbs` to install FASM on your machine automatically;
   4. Use `compile.cmd` to compile `flatcheat.asm` automatically.
-5. Inject `flatcheat.dll` by using an injector ([Simple Injector by RIscRIpt](http://www.riscript.com/downloads/Injector/ "Simple Injector by RIscRIpt")).
+5. Inject `flatcheat.dll` by using [an injector](http://www.riscript.com/downloads/Injector/ "Simple Injector by RIscRIpt").
 
 --
 ### Features:
@@ -18,6 +18,11 @@ Counter-Strike 1.6 ring3 cheat written in FASM (flat assembler)
 4. FastRun `NSD`
 5. Bunny Hop (+StandUp)
 6. Kreedz Info
+
+### Donate
+
+A lot of hours and a lot of love have been put into the development of flatcheat. If you use it and enjoy it, why not [consider donating](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=QPB8CE884H9PG)?
+
 
 --
 ######Official support website: http://www.riscript.com/
