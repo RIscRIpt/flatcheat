@@ -823,6 +823,25 @@ struct SCREENINFO_s
 	charWidths	dw 256 dup ?
 ends ;SCREENINFO
 
+struct cs_player_info_s
+	frags			dw ?
+	deaths			dw ?
+	classid			dd ?
+	isvip			dd ?
+	hasbomb			dd ?
+	radarpos		vec3_s
+	updatecount		dd ?
+	minupdate		dd ?
+	maxupdate		dd ?
+	barteam			dw ?
+	team			dw ?
+	teamname		db 16 dup ?
+	isdead			dd ?
+	nextupdatetime	dd ? ;float
+	health			dd ?
+	location		db 32 dup ?
+ends ;cs_player_info_s
+
 struct ClientDLL_s
 	Initialize						dd ?
 	HUD_Init						dd ?

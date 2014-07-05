@@ -21,3 +21,6 @@ asm_instr MOV_ESI_DWORD_PTR,	0x358B,	2
 asm_instr MOV_DWORD_PTR_BYTE, 	0x05C7,	2
 asm_instr FLD_DWORD_PTR,		0x05D9,	2
 asm_instr FLD_QWORD_PTR,		0x05DD,	2
+
+asm_instr PREFIX_VEX,			0x0F,	1
+asm_instr VEX_MOVSX_EAX_WORD_PTR, 0x87BF, 1

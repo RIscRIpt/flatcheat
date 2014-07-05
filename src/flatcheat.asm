@@ -7,6 +7,7 @@ include 'macro/print.inc'
 include 'cs_types.inc'
 include '../features.ini'
 include 'feature_math.inc'
+include 'opengldef.inc'
 
 entry DllMain
 
@@ -26,6 +27,8 @@ section '.data' data readable writeable
 	include 'clientdll/clientdll.inc'
 	include 'engine/engine.inc'
 	include 'drawing/drawing.inc'
+	include 'studio/studio_interface.inc'
+	include 'studio/studio_model_render.inc'
 	include 'fc_cmds/cmd_funcs.inc'
 	
 	include 'utilities/utilities.inc'
@@ -120,17 +123,22 @@ section '.code' code readable writeable executable
 	include 'clientdll/clientdll.asm'
 	include 'engine/engine.asm'
 	include 'drawing/drawing.asm'
+	include 'studio/studio_interface.asm'
+	include 'studio/studio_model_render.asm'
 	include 'fc_cmds/cmd_funcs.asm'
 
 section '.idata' import data readable writeable
 	library	kernel32,	'kernel32.dll',\
 			user32,		'user32.dll',\
 			advapi32,	'advapi32.dll',\
+			opengl32,	'opengl32.dll',\
+			glu32,		'glu32.dll',\
 			msvcrt,		'msvcrt.dll'
 	
 	include 'api/kernel32.inc'
 	include 'api/user32.inc'
 	include 'api/advapi32.inc'
+	include 'api/opengl32.inc'
 	import msvcrt,\
 		atof,		'atof',\
 		gcvt,		'_gcvt',\

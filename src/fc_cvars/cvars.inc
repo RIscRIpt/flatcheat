@@ -53,23 +53,25 @@ macro cvar name, def_val {
 	name#.def_val dd cvarDefValDump + cvar_aodv_offset_#def_val
 }
 
-macro define_cvar name, def_val {
-	if CVAR_PREPROCESS = 1
-		virtual at 0
-			db PREFIX
-			db `name, 0
-			CVAR_NAME_DUMP_SIZE = CVAR_NAME_DUMP_SIZE + $
-		end virtual
-		if ~ defined DEF_CVAR_LIST_DEFV_#def_val
+macro define_cvar ftr, name, def_val {
+	if defined ftr & ftr
+		if CVAR_PREPROCESS = 1
 			virtual at 0
-				db `def_val, 0
-				CVAR_DEFVAL_DUMP_SIZE = CVAR_DEFVAL_DUMP_SIZE + $
+				db PREFIX
+				db `name, 0
+				CVAR_NAME_DUMP_SIZE = CVAR_NAME_DUMP_SIZE + $
 			end virtual
-			define DEF_CVAR_LIST_DEFV_#def_val 1
+			if ~ defined DEF_CVAR_LIST_DEFV_#def_val
+				virtual at 0
+					db `def_val, 0
+					CVAR_DEFVAL_DUMP_SIZE = CVAR_DEFVAL_DUMP_SIZE + $
+				end virtual
+				define DEF_CVAR_LIST_DEFV_#def_val 1
+			end if
+			cvar_aodv_offset_#def_val = -1
+		else
+			cvar name, def_val
 		end if
-		cvar_aodv_offset_#def_val = -1
-	else
-		cvar name, def_val
 	end if
 }
 

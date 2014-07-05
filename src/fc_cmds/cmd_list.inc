@@ -1,10 +1,10 @@
-define_cmd exec
+define_cmd ALWAYS_ENABLED, exec
 
-define_cmd max_flash
+define_cmd MAX_FLASH, max_flash
 
-define_switch fps_boost
-define_switch fastrun
-define_switch jumpbug
-define_switch strafe
-define_switch groundstrafe
-define_switch groundstrafe_standup
+define_switch ALWAYS_ENABLED, fps_boost
+define_switch FASTRUN, fastrun
+define_switch JUMPBUG, jumpbug
+define_switch STRAFE, strafe
+define_switch GROUNDSTRAFE, groundstrafe
+define_switch GROUNDSTRAFE_STANDUP, groundstrafe_standup

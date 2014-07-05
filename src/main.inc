@@ -23,11 +23,13 @@ pConsoleColor				dd ? ;ptr to Console text color
 pConsoleDevColor			dd ? ;ptr to Console text color, when developer = 1
 pScreenPrintColor			dd ? ;ptr to Screen text color (that is used by pfnDrawConsoleString)
 pushScreenFade				dd ? ;ptr to push OFFSET "ScreenFade"
+pushStarBot					dd ? ;ptr to push OFFSET "*bot"
 pClientDLL					dd ? ;ptr to ClientDLL_s
 pEngine						dd ? ;ptr to Engine_s
 pushErrMsgClDLLStudioRI		dd ? ;ptr to push OFFSET "Couldn't get client .dll studio model rendering interface."
 pEngineStudio				dd ?
 pStudioInterface			dd ?
+pStudioModelRender			dd ?
 pRefreshFunc				dd ? ;ptr to Refresh function (where r_norefresh is checked)
 pRefreshFuncOrigCalls		dd 6 dup ? ;6 original function calls in pRefreshFunc (that are required)
 pRefreshFuncOrigAddrs		dd 2 dup ? ;2 original function addresses in pRefreshFunc
@@ -35,6 +37,7 @@ pLimitConnectionCvarsFunc	dd ?
 pSetinfoJmpPatchPlace		dd ?
 pViewMatrix					dd ? ;(not sure if it's really viewmatrix) used in WorldToScreen (and CalcScreen)
 pWorldToScreen				dd ? ;ptr to original function WorldToScreen (in hw.dll)
+pCSPlayerInfo				dd ? ;ptr to CS cs_player_info_s
 
 pClientSpeed				dd ? ;ptr to Client speed multiplier
 pClientTime					dd ? ;ptr to Client time
@@ -47,8 +50,15 @@ pRegCmdWFMallocCall			dd ? ;ptr to RegisterCommand with flag, malloc call addres
 
 pCvarFpsOverride			dd ? ;ptr to `fps_override` cvar_s
 
+pDrawConStrResetColorCall	dd ? ;ptr to call procedure in pfnDrawConsoleString to reset drawing color
+
+
 ClientDLL		ClientDLL_s
 Engine			Engine_s
+
+EngineStudio		EngineStudio_s
+StudioInterface		StudioInterface_s
+StudioModelRender	StudioModelRender_s
 
 screenInfo		SCREENINFO_s
 screenCenterX	dd ?
@@ -72,6 +82,10 @@ restoreList_Engine:
 	VTRestore_s pEngine, Engine, Engine_s.pfnHookUserMsg
 	VTRestore_s pEngine, Engine, Engine_s.pfnAddCommand
 	VTRestore_s pEngine, Engine, Engine_s.pfnRegisterVariable
+	dd 0
+
+hookList_StudioModelRender:
+	chkftr <F_HOOK_STUDIOMODELRENDER>,	<VTHook_s pStudioModelRender, StudioModelRender_s.StudioRenderModel, StudioRenderModel>
 	dd 0
 
 cvarHookList:

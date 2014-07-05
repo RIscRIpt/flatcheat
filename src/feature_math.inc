@@ -138,18 +138,29 @@ if sizeof.PREFIX <= 0
 	err
 end if
 
+;Constant that is always 1 (used for defining cvars & cmds)
+ALWAYS_ENABLED = 1
+
 F_HOOK_CL_CREATEMOVE = 0
 F_HOOK_HUD_REDRAW = 0
 F_HOOK_HUD_ADDENTITY = 0
+F_HOOK_STUDIOMODELRENDER = 0
 
 SCREEN_INFO_KREEDZ = 0
 
+;disable some features if no subfeatures of the feature is enabled
 noftr <\
 	SI_FLASHED,\
 	SI_KZ_HSPEED,\
 	SI_KZ_VSPEED,\
 	SI_KZ_HEIGHT,\
-0>, <SCREEN_INFO = 0> ;disable SCREEN_INFO if no SCREEN_INFO feature is enabled
+0>, <SCREEN_INFO = 0>
+
+noftr <\
+	ESP_ENTITIES,\
+	ESP_PLAYERS,\
+0>, <ESP_ENABLED = 0>
+
 
 anyftr <\
 	SI_KZ_HSPEED,\
@@ -174,3 +185,7 @@ anyftr <\
 anyftr <\
 	KNIFEBOT,\
 0>, <F_HOOK_HUD_ADDENTITY = 1>
+
+anyftr <\
+	ESP_ENABLED,\
+0>, <F_HOOK_STUDIOMODELRENDER = 1>

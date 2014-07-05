@@ -22,6 +22,7 @@ proc HUD_Redraw c time, intermission
 	mov [oHUD_Redraw_result], eax
 	
 	feature SCREEN_INFO
+		mov dword[screenColor], SI_KZ_COLOR
 		inline_feature SI_KZ_HSPEED, <stdcall WriteDoublCenter, [SI_KZ_HSpeed_coord.x], [SI_KZ_HSpeed_coord.y], szKZ_HSpeed, szKZ_HSpeedData, double[me.horizontal_speed]>
 		inline_feature SI_KZ_VSPEED, <stdcall WriteDoublCenter, [SI_KZ_VSpeed_coord.x], [SI_KZ_VSpeed_coord.y], szKZ_VSpeed, szKZ_VSpeedData, double[me.vertical_speed]>
 		inline_feature SI_KZ_HEIGHT, <stdcall WriteDoublCenter, [SI_KZ_Height_coord.x], [SI_KZ_Height_coord.y], szKZ_Height, szKZ_HeightData, double[me.distance_to_ground]>

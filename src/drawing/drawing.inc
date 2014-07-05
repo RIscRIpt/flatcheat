@@ -17,3 +17,9 @@ flPOne dd 1.0
 flMOne dd -1.0
 flScreenCenter vec2_s
 screenCoord vec2_s
+
+; Green -            |  Unknown  |
+; Red -                   |     T     |
+; Blue -                       |    CT     |
+teamColorArray3UB db $00, $FF, $00, $00, $FF
+entityColor db $E1, $96, $00

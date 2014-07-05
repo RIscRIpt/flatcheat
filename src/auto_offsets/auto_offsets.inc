@@ -28,6 +28,8 @@ dd AO_GetScreenFadePushReference	;for Engine, ClientDLL, pPmove
 dd AO_GetEngine
 
 dd AO_GetClientDLL
+dd AO_GetClientPushXBotRef
+dd AO_GetClientPlayerInfoStructPtr
 dd AO_GetPlayerMove_Ptr
 dd AO_GetClientDLL_Interface_Version
 
@@ -38,6 +40,7 @@ dd AO_GetScreenFade
 dd AO_GetPushHGSMIReference
 dd AO_GetEngineStudio
 dd AO_GetStudioModelInterface
+dd AO_GetStudioModelRender
 
 dd AO_GetConsoleColor
 dd AO_GetScreenPrintColor
@@ -54,6 +57,8 @@ dd AO_GetFuncLimitConnectionCvars
 dd AO_GetSetinfoJmpPatchPlace
 
 dd AO_GetWorldToScreenViewMatrix
+
+dd AO_GetDrawStrRestoreConColorCall
 ao_getListEnd:
 
 ;Patterns:
@@ -65,6 +70,7 @@ string szr_norefresh,						'r_norefresh'
 string bpClearFunction, $55, $8B, $EC, $83, $EC, $14, $D9, $05, $FF, $FF, $FF, $FF, $D8, $1D, $FF, $FF, $FF, $FF, $DF, $E0, $F6, $C4, $44, $0F, $8A
 string szcl_updatereate_min,				'cl_updaterate minimum is %f'
 string szCantSetStarKeys,					"Can't set * keys", 10
+string szStarBot,							'*bot'
 
 ;Offsets:
 offOrigClearFunctions db 0x7B, 0x0E, 0x05, 0x0E, 0x05, 0x05, 0x00
@@ -79,6 +85,8 @@ string szLocation,							'location'
 string szAO_GetScreenFadePushReference,		'AO_GetScreenFadePushReference'
 string szAO_GetEngine,						'AO_GetEngine'
 string szAO_GetClientDLL,					'AO_GetClientDLL'
+string szAO_GetClientPushXBotRef,			'AO_GetClientPushXBotRef'
+string szAO_GetClientPlayerInfoStructPtr,	'AO_GetClientPlayerInfoStructPtr'
 string szAO_GetPlayerMove_Ptr,				'AO_GetPlayerMove_Ptr'
 string szAO_GetClientDLL_Interface_Version,	'AO_GetClientDLL_Interface_Version'
 string szAO_GetClientSpeedMultiplier,		'AO_GetClientSpeedMultiplier'
@@ -97,6 +105,8 @@ string szAO_GetRefreshFuncOrigAddessess,	'AO_GetRefreshFuncOrigAddessess'
 string szAO_GetFuncLimitConnectionCvars,	'AO_GetFuncLimitConnectionCvars'
 string szAO_GetSetinfoJmpPatchPlace,		'AO_GetSetinfoJmpPatchPlace'
 string szAO_GetWorldToScreenViewMatrix,		'AO_GetWorldToScreenViewMatrix'
+string szAO_GetStudioModelRender,			'AO_GetStudioModelRender'
+string szAO_GetDrawStrRestoreConColorCall,	'AO_GetDrawStrRestoreConColorCall'
 
 string szByte,								'byte'
 string szWord,								'word'

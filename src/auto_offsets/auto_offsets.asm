@@ -101,6 +101,41 @@ proc AO_GetClientDLL
 	ret
 endp
 
+proc AO_GetClientPushXBotRef
+	stdcall FindBytePattern, [client.base], [client.size], szStarBot, sizeof.szStarBot - 1
+	test eax, eax
+	jnz .found1
+	jmpcall ShowFatalError, szErr_s_FailedToFindXOf_s,\
+		szAO_GetClientPushXBotRef, szLocation, szStarBot
+	.found1:
+	FindRefWithPrefix [client.base], [client.size], ASM_INSTR_PUSH_DWORD, sizeof.ASM_INSTR_PUSH_DWORD, eax
+	test eax, eax
+	jnz .found2
+	jmpcall ShowFatalError, szErr_s_FailedToFindXOf_s,\
+		szAO_GetClientPushXBotRef, szReference, szStarBot
+	.found2:
+	mov [pushStarBot], eax
+	ret
+endp
+
+proc AO_GetClientPlayerInfoStructPtr
+	mov eax, [pushStarBot]
+	sub eax, 0x26
+	cmp byte[eax], ASM_INSTR_PREFIX_VEX
+	jne .error1
+	cmp word[eax + 1], ASM_INSTR_VEX_MOVSX_EAX_WORD_PTR
+	jne .error2
+	mov eax, [eax + 3]
+	mov [pCSPlayerInfo], eax
+	ret
+	.error1:
+	jmpcall ShowFatalError, szErr_s_Failed_Invalid_x_at_x_x,\
+		szAO_GetClientPlayerInfoStructPtr, szByte, [eax], eax, ASM_INSTR_PREFIX_VEX
+	.error2:
+	jmpcall ShowFatalError, szErr_s_Failed_Invalid_x_at_x_x,\
+		szAO_GetClientPlayerInfoStructPtr, szWord, [eax], eax, ASM_INSTR_VEX_MOVSX_EAX_WORD_PTR
+endp
+
 proc AO_GetPlayerMove_Ptr
 	mov eax, [pushScreenFade]
 	add eax, 0x17
@@ -207,6 +242,7 @@ proc AO_GetEngineStudio
 	.found:
 	mov eax, [eax - 0x14]
 	mov [pEngineStudio], eax
+	memcpy EngineStudio, eax, sizeof.EngineStudio_s
 	ret
 endp
 
@@ -220,6 +256,22 @@ proc AO_GetStudioModelInterface
 	mov eax, [eax - 0x0F]
 	mov eax, [eax]
 	mov [pStudioInterface], eax
+	memcpy StudioInterface, eax, sizeof.StudioInterface_s
+	ret
+endp
+
+proc AO_GetStudioModelRender
+	mov eax, [StudioInterface.StudioDrawModel]
+	add eax, 0x04
+	cmp byte[eax], ASM_INSTR_MOV_ECX_DWORD
+	je .found
+	jmpcall ShowFatalError, szErr_s_Failed_Invalid_x_at_x_x,\
+		szAO_GetStudioModelRender, szByte, [eax], eax, ASM_INSTR_MOV_ECX_DWORD
+	.found:
+	mov eax, [eax + 1]
+	mov eax, [eax]
+	mov [pStudioModelRender], eax
+	memcpy StudioModelRender, eax, sizeof.StudioModelRender_s
 	ret
 endp
 
@@ -476,5 +528,17 @@ proc AO_GetWorldToScreenViewMatrix
 	.found2:
 	mov eax, [eax + 2]
 	mov [pViewMatrix], eax
+	ret
+endp
+
+proc AO_GetDrawStrRestoreConColorCall
+	mov eax, [Engine.pfnDrawConsoleString]
+	add eax, 0x21
+	cmp byte[eax], ASM_INSTR_CALL
+	je .found
+	jmpcall ShowFatalError, szErr_s_Failed_Invalid_x_at_x_x,\
+		szAO_GetDrawStrRestoreConColorCall, szByte, [eax], eax, ASM_INSTR_CALL
+	.found:
+	mov [pDrawConStrResetColorCall], eax
 	ret
 endp

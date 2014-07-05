@@ -19,7 +19,6 @@ proc pfnRegisterVariable szName, szValue, flags
 	cinvoke Engine.pfnGetCvarPointer, [szName]
 	test eax, eax
 	jnz .ret
-	;cinvoke Engine.pfnRegisterVariable, [szName], [szValue], [flags]
 	jmp [Engine.pfnRegisterVariable]
 	.ret:
 	ret

@@ -7,6 +7,7 @@ proc flatcheat_inject
 	;cinvoke ClientDLL.Initialize, [pEngine], [ClientDLL_Interface_Version]
 	;cinvoke ClientDLL.HUD_Init
 	;stdcall Restore_List, restoreList_Engine
+	stdcall Hook_List, hookList_StudioModelRender
 	
 	stdcall Hook_Cvars
 	
@@ -18,6 +19,7 @@ proc flatcheat_inject
 	
 	stdcall PatchRefreshFunc
 	stdcall PatchWorldToScreen
+	stdcall PatchDrawConsoleString
 	chkftr PATCH_CONNECTION_CVARS, <stdcall PatchConnectionCvars>
 	chkftr PATCH_SETINFO, <stdcall PatchSetinfo>
 	
@@ -31,16 +33,21 @@ proc flatcheat_inject
 endp
 
 proc Hook_List, list
+	local oldprot dd ?
 	mov ebx, [list]
 	virtual at ebx
 		.vt VTHook_s
 	end virtual
 	.next:
-	mov eax, [.vt.table]
-	mov eax, [eax]
-	add eax, [.vt.table_offset]
+	mov edi, [.vt.table]
+	mov edi, [edi]
+	add edi, [.vt.table_offset]
+	lea eax, [oldprot]
+	stdcall VirtualProtect_s, edi, 4, PAGE_EXECUTE_READWRITE, eax
 	mov edx, [.vt.new_func]
-	mov [eax], edx
+	mov [edi], edx
+	lea eax, [oldprot]
+	stdcall VirtualProtect_s, edi, 4, [oldprot], eax
 	add ebx, sizeof.VTHook_s
 	cmp dword[ebx], 0
 	jne .next
@@ -48,17 +55,23 @@ proc Hook_List, list
 endp
 
 proc Restore_List, list
+	local oldprot dd ?
 	mov ebx, [list]
 	virtual at ebx
 		.vt VTRestore_s
 	end virtual
 	.next:
-	mov eax, [.vt.table]
-	mov eax, [eax]
-	mov edx, [.vt.table_orig]
+	mov edi, [.vt.table]
+	mov edi, [edi]
 	mov ecx, [.vt.table_offset]
-	mov edx, [edx + ecx]
-	mov [eax + ecx], edx
+	mov esi, [.vt.table_orig]
+	add edi, ecx
+	mov esi, [esi + ecx]
+	lea eax, [oldprot]
+	stdcall VirtualProtect_s, edi, 4, PAGE_EXECUTE_READWRITE, eax
+	mov [edi], esi
+	lea eax, [oldprot]
+	stdcall VirtualProtect_s, edi, 4, [oldprot], eax
 	add ebx, sizeof.VTRestore_s
 	cmp dword[ebx], 0
 	jne .next
@@ -358,5 +371,18 @@ proc PatchWorldToScreen
 		mov [base], edi
 		jmp .loop
 	.done:
+	ret
+endp
+
+proc PatchDrawConsoleString ;Disable restoring con_color
+	local oldprot dd ?
+	mov edi, [pDrawConStrResetColorCall]
+	lea eax, [oldprot]
+	stdcall VirtualProtect_s, edi, 5, PAGE_EXECUTE_READWRITE, eax
+	;Patch with 5byte NOP
+	mov byte[edi], 0x66
+	mov dword[edi + 1], 0x90666666
+	lea eax, [oldprot]
+	stdcall VirtualProtect_s, edi, sizeof.refreshFuncPatch, [oldprot], eax
 	ret
 endp

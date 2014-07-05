@@ -28,3 +28,7 @@ macro jmpcall dest, [arg] { ; push dword arguments and jump to destination
 	end if
     jmp dest
 }
+
+macro color_rgba name, r, g, b, a {
+	name = (a shl 24) or (b shl 16) or (g shl 8) or (r shl 0)
+}

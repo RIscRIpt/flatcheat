@@ -35,6 +35,9 @@
             <File name="drawing/drawing.asm" />
             <File name="drawing/drawing.inc" />
         </Folder>
+        <Folder name="api">
+            <File name="api\opengl32.inc" />
+        </Folder>
         <Folder name="dynamic api">
             <File name="dynamic_api/dynwinapi.asm" />
             <File name="dynamic_api/dynwinapi.inc" />
@@ -46,6 +49,12 @@
         <Folder name="opengl">
             <File name="opengl/opengl.asm" />
             <File name="opengl/opengl.inc" />
+        </Folder>
+        <Folder name="studio">
+            <File name="studio\studio_interface.asm" />
+            <File name="studio\studio_interface.inc" />
+            <File name="studio\studio_model_render.asm" />
+            <File name="studio\studio_model_render.inc" />
         </Folder>
         <Folder name="helper scripts">
             <File name="../compile.cmd" />
@@ -62,6 +71,7 @@
         <Folder name="utilities">
             <File name="utilities/utilities.asm" />
             <File name="utilities/utilities.inc" />
+            <File name="utilities\asm_instr_list.inc" />
         </Folder>
         <File name="cs_types.inc" />
         <File name="windef.inc" />
