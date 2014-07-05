@@ -20,6 +20,7 @@ Counter-Strike 1.6 ring3 cheat written in FASM (flat assembler)
   4. Use `compile.cmd` to compile `flatcheat.asm` automatically.
 5. Inject `flatcheat.dll` by using [an injector](http://www.riscript.com/downloads/Injector/ "Simple Injector by RIscRIpt").
 
+--
 ### Donate
 
 A lot of hours and a lot of love have been put into the development of flatcheat. If you use it and enjoy it, why not [consider donating](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=QPB8CE884H9PG)?
