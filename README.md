@@ -3,14 +3,6 @@
 Counter-Strike 1.6 ring3 cheat written in FASM (flat assembler)
 
 ---
-### How-to-use:
-1. [Download](https://github.com/RIscRIpt/flatcheat/archive/master.zip) the latest stable release;
-2. Compile `flatcheat.asm` with [FASM](http://flatassembler.net/download.php) on your own ;
-  3. Or run `download_fasm.vbs` to install FASM on your machine automatically;
-  4. Use `compile.cmd` to compile `flatcheat.asm` automatically.
-5. Inject `flatcheat.dll` by using [an injector](http://www.riscript.com/downloads/Injector/ "Simple Injector by RIscRIpt").
-
---
 ### Features:
 1. Strafes Hack (*Max8w*)
 2. JumpBug Hack
@@ -18,6 +10,15 @@ Counter-Strike 1.6 ring3 cheat written in FASM (flat assembler)
 4. FastRun `NSD`
 5. Bunny Hop (+StandUp)
 6. Kreedz Info
+7. Removals (No Flash)
+
+--
+### How-to-use:
+1. [Download](https://github.com/RIscRIpt/flatcheat/archive/master.zip) the latest stable release;
+2. Compile `flatcheat.asm` with [FASM](http://flatassembler.net/download.php) on your own ;
+  3. Or run `download_fasm.vbs` to install FASM on your machine automatically;
+  4. Use `compile.cmd` to compile `flatcheat.asm` automatically.
+5. Inject `flatcheat.dll` by using [an injector](http://www.riscript.com/downloads/Injector/ "Simple Injector by RIscRIpt").
 
 ### Donate
 
