@@ -41,6 +41,9 @@ proc StudioRenderModel c ;esi must be preserved
 	end virtual
 
 	feature ESP_ENABLED
+		cmp [esp.value], 0.0
+		je .end_ESP_ENABLED
+		
 		mov edi, [.this.m_pCurrentEntity]
 		virtual at edi
 			.entity cl_entity_s
@@ -61,6 +64,9 @@ proc StudioRenderModel c ;esi must be preserved
 						jne .ee_restore_3d
 					end if
 					;Entity is not a player
+					cmp [esp_entities.value], 0.0
+					je .end_ESP_ENTITIES
+					
 					invoke glColor3ubv, entityColor
 					invoke glVertex2iv, screenCoord
 					add [screenCoord.x], 3
@@ -78,12 +84,17 @@ proc StudioRenderModel c ;esi must be preserved
 				endf
 				
 				feature ESP_PLAYERS
-					;Entity is a player				
+					;Entity is a player
+					cmp [esp_players.value], 0.0
+					je .end_ESP_PLAYERS
+					
 					imul edx, [.entity.index], sizeof.cs_player_info_s
 					add edx, [pCSPlayerInfo]
 					virtual at edx
 						.cs_player_info cs_player_info_s
 					end virtual
+					cmp [.cs_player_info.isdead], 0
+					jne .end_ESP_PLAYERS
 					movzx ecx, byte[.cs_player_info.team]
 					lea eax, [teamColorArray3UB + ecx]
 					invoke glColor3ubv, eax
