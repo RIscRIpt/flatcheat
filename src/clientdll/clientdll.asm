@@ -31,8 +31,8 @@ proc HUD_Redraw c time, intermission
 			cmp al, 255
 			je .end_SI_FLASHED
 			
-			mov esi, [pScreenFade]
-			virtual at esi
+			mov edi, [pScreenFade]
+			virtual at edi
 				.screenfade screenfade_s
 			end virtual
 			
