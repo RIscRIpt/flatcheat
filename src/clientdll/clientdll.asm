@@ -51,6 +51,8 @@ proc HUD_Redraw c time, intermission
 			comiss xmm0, xmm1
 			jbe .end_SI_FLASHED
 			
+			push ebx ;Preserve EBX as it is required by caller
+			
 			mulss xmm0, [float255_to_percent]
 			cvtss2si ebx, xmm0
 			
@@ -65,11 +67,13 @@ proc HUD_Redraw c time, intermission
 			mov ecx, [SI_MAX_FLASHED_coord.x]
 			sub ecx, eax
 			
+			pop ebx
+			
 			mov dword[screenColor], 0xFF0000FF ;Red
 			cinvoke Engine.pfnDrawConsoleString, ecx, [SI_MAX_FLASHED_coord.y], szMAX_FLASHED
 		endf
 	endf
-	
+
 	mov eax, [oHUD_Redraw_result]
 	ret
 endp
