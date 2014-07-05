@@ -29,8 +29,7 @@ macro Setup3D {
 	invoke glLoadMatrixf, srm_ModelViewMatrix
 	invoke glMatrixMode, GL_PROJECTION
 	invoke glLoadMatrixf, srm_ProjectionMatrix
-	;Assume switching matrix mode is not required
-	;invoke glMatrixMode, GL_MODELVIEW
+	invoke glMatrixMode, GL_MODELVIEW
 }
 
 proc StudioRenderModel c ;esi must be preserved
