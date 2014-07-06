@@ -352,12 +352,10 @@ proc CL_CreateMove c frametime, cmd, active
 					or dword[.cmd.buttons], IN_DUCK
 					and dword[.cmd.buttons], not IN_JUMP
 					movss xmm0, [frametime]
-					mulss xmm0, [.pmove.velocity.z]
-					xorps xmm0, xword[SSE_FLOAT_CHS_MASK]
+					mulss xmm0, [.pmove.flFallVelocity]
 					comiss xmm0, xmm1
-					jbe .end_JUMPBUG
-						movss xmm0, [floatOne]
-						divss xmm0, [frametime]
+					jb .end_JUMPBUG
+						rcpss xmm0, [frametime]
 						cvtss2sd xmm0, xmm0
 						movlpd [clientSpeed], xmm0
 	endf
