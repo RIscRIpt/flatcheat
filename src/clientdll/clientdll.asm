@@ -84,9 +84,22 @@ endp
 ;in CL_CreateMove 2nd arg (esp + 8) = 049C32D4 (var)
 ;=> ESI = cmd (usercmd_s)
 proc CL_CreateMove c frametime, cmd, active
+	feature FPS_HELPER
+		cmp [fps_helper.value], 0.0
+		je .end_FPS_HELPER
+			rcpss xmm0, [frametime]
+			addss xmm0, [float1000]
+			subss xmm0, [fps_helper.value]
+			cvtss2sd xmm0, xmm0
+			movlpd [clientSpeed], xmm0
+			jmp .skip_setup_clspeed
+	endf
+	
 	movss xmm0, [speed.value]
 	cvtss2sd xmm0, xmm0
 	movlpd [clientSpeed], xmm0
+	
+	.skip_setup_clspeed:
 
 	cinvoke ClientDLL.CL_CreateMove, [frametime], [cmd], [active]
 	mov [oCL_CreateMove_result], eax

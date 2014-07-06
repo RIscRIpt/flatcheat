@@ -52,12 +52,25 @@ proc Command_strafe
 	jne .minus
 	.plus:
 		bts [userButtons], UB_STRAFE
-		cmp [strafe_use_fps_boost.value], 0
+		if defined FPS_HELPER & FPS_HELPER
+			cmp [strafe_use_fps_helper.value], 0.0
+			je .p_skip_fps_helper
+				mov eax, [strafe_use_fps_helper.value]
+				xchg eax, [fps_helper.value]
+				mov [strafe_use_fps_helper.value], eax
+			.p_skip_fps_helper:
+		end if
+		cmp [strafe_use_fps_boost.value], 0.0
 		jne Command_fps_boost.plus
 		ret
 	.minus:
 		btr [userButtons], UB_STRAFE
-		cmp [strafe_use_fps_boost.value], 0
+		if defined FPS_HELPER & FPS_HELPER
+			mov eax, [fps_helper.value]
+			xchg eax, [strafe_use_fps_helper.value]
+			mov [fps_helper.value], eax
+		end if
+		cmp [strafe_use_fps_boost.value], 0.0
 		jne Command_fps_boost.minus
 		ret
 endp
