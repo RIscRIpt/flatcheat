@@ -93,12 +93,14 @@ cvarHookList:
 	CvarHook_s cvar_fps_max + sizeof.PREFIX,			cvar_fps_max,			0
 	CvarHook_s cvar_fps_override + sizeof.PREFIX,		cvar_fps_override,		pCvarFpsOverride
 	CvarHook_s cvar_ex_interp + sizeof.PREFIX,			cvar_ex_interp,			0
+	CvarHook_s cvar_r_drawviewmodel + sizeof.PREFIX,	cvar_r_drawviewmodel,	0
 	dd 0
 
 
 string cvar_fps_max,		PREFIX, 'fps_max'
 string cvar_fps_override,	PREFIX, 'fps_override'
 string cvar_ex_interp,		PREFIX, 'ex_interp'
+string cvar_r_drawviewmodel,PREFIX, 'r_drawviewmodel'
 
 string szWelcomeMessage, 'flatcheat has been successfully loaded.', 10
 
