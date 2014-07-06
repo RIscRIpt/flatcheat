@@ -42,6 +42,7 @@ pCSPlayerInfo				dd ? ;ptr to CS cs_player_info_s
 pClientSpeed				dd ? ;ptr to Client speed multiplier
 pClientTime					dd ? ;ptr to Client time
 pScreenFade					dd ? ;ptr to Client screenfade_s struct
+pIsThirdPerson				dd ? ;ptr to IsThirdPerson value that is used by CL_IsThirdPerson for cam_command
 
 pRegVarMallocCall			dd ? ;ptr to pfnRegisterVariable malloc call address
 

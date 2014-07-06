@@ -32,6 +32,7 @@ dd AO_GetClientPushXBotRef
 dd AO_GetClientPlayerInfoStructPtr
 dd AO_GetPlayerMove_Ptr
 dd AO_GetClientDLL_Interface_Version
+dd AO_GetClientDLL_IsThirdPersonPtr
 
 dd AO_GetClientSpeedMultiplier
 dd AO_GetClientTimePtr
@@ -89,6 +90,7 @@ string szAO_GetClientPushXBotRef,			'AO_GetClientPushXBotRef'
 string szAO_GetClientPlayerInfoStructPtr,	'AO_GetClientPlayerInfoStructPtr'
 string szAO_GetPlayerMove_Ptr,				'AO_GetPlayerMove_Ptr'
 string szAO_GetClientDLL_Interface_Version,	'AO_GetClientDLL_Interface_Version'
+string szAO_GetClientDLL_IsThirdPersonPtr,	'AO_GetClientDLL_IsThirdPersonPtr'
 string szAO_GetClientSpeedMultiplier,		'AO_GetClientSpeedMultiplier'
 string szAO_GetClientTimePtr,				'AO_GetClientTimePtr'
 string szAO_GetScreenFade,					'AO_GetScreenFade'

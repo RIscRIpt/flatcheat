@@ -122,3 +122,16 @@ proc Command_max_flash
 		cinvoke Engine.Con_Printf, szFmtLim_int, [max_flash.name], 0, 255
 		ret
 endp
+
+proc Command_thirdperson
+	cinvoke Engine.Cmd_Argv, 0
+	mov edx, [pIsThirdPerson]
+	cmp byte[eax], '+'
+	jne .minus
+	.plus:
+		mov byte[edx], 1
+		ret
+	.minus:
+		mov byte[edx], 0
+		ret
+endp

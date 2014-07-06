@@ -171,6 +171,18 @@ proc AO_GetClientDLL_Interface_Version
 	ret
 endp
 
+proc AO_GetClientDLL_IsThirdPersonPtr
+	mov eax, [ClientDLL.CL_IsThirdPerson]
+	cmp byte[eax], ASM_INSTR_MOV_EAX_DWORD_PTR
+	je .found
+	jmpcall ShowFatalError, szErr_s_Failed_Invalid_x_at_x_x,\
+		szAO_GetClientDLL_IsThirdPersonPtr, szByte, [eax], eax, ASM_INSTR_MOV_EAX_DWORD_PTR
+	.found:
+	mov eax, [eax + 1]
+	mov [pIsThirdPerson], eax
+	ret
+endp
+
 proc AO_GetClientSpeedMultiplier
 	stdcall FindBytePattern, [hw.base], [hw.size], szTextureLoadMs, sizeof.szTextureLoadMs - 1
 	test eax, eax
