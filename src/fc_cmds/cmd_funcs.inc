@@ -19,6 +19,9 @@ showFrameN dd 0
 
 maxFlashAlpha db ?
 
+string szPfps_boostcfg,				'+fps_boost.cfg'
+string szMfps_boostcfg,				'-fps_boost.cfg'
+
 string szCmdExecUsage,			'Usage: ', PREFIX, 'exec "path to a script.cfg"', 13, 10
 
 string szFmtCV_int,				'"%s" is "%i"', 13, 10

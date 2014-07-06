@@ -12,6 +12,10 @@ proc Command_fps_boost
 		bts [userButtons], UB_FPS_BOOST
 		mov ecx, [pCvarFpsOverride]
 		mov [ecx], edx
+		cmp [fps_boost_use_config.value], 0.0
+		je .p_skip_config
+			stdcall Exec, szPfps_boostcfg
+		.p_skip_config:
 		ret
 	.minus:
 		mov [r_norefresh.value], 0.0
@@ -19,6 +23,10 @@ proc Command_fps_boost
 		xor eax, eax
 		mov ecx, [pCvarFpsOverride]
 		mov [ecx], eax
+		cmp [fps_boost_use_config.value], 0.0
+		je .m_skip_config
+			stdcall Exec, szMfps_boostcfg
+		.m_skip_config:
 		ret
 endp
 

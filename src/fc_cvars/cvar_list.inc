@@ -18,6 +18,7 @@ define_cvar FASTRUN, fastrun_sidemove, 135.063748
 define_cvar ALWAYS_ENABLED, r_norefresh, 0
 
 define_cvar ALWAYS_ENABLED, fps_boost_skip_nframes, 7
+define_cvar ALWAYS_ENABLED, fps_boost_use_config, 1
 
 define_cvar FPS_HELPER, fps_helper, 0
 
