@@ -1,6 +1,6 @@
 #flatcheat
 
-Counter-Strike 1.6 ring3 cheat (Steam only) written in FASM (flat assembler)
+Counter-Strike 1.6 ring3 cheat (`Steam`) written in FASM (flat assembler)
 
 ---
 ### Features:
