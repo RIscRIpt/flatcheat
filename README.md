@@ -1,8 +1,11 @@
-#flatcheat
+flatcheat
+=============
 
 Counter-Strike 1.6 ring3 cheat `Steam-only` written in FASM (flat assembler).
 
-As of July 12th 2014 is no longer open source. Updated versions are closed source and are available at http://riscript.com/ in the 'Downloads' section for registered members.
+    As of July 12th 2014 is no longer open source, nor updated here.
+
+The latest and updated version is available at http://riscript.com/ in the `Downloads` section for registered members.
 
 ---
 ### Features:
